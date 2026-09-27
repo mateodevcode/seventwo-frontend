@@ -199,7 +199,7 @@
 .home-root p { margin: 0; }
 .home-root h1,
 .home-root h2 {
-  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-family:  Impact, var(--font-archivo-black), 'Arial Narrow', sans-serif;
   font-weight: 400;
   letter-spacing: -.025em;
   text-transform: uppercase;
@@ -247,9 +247,9 @@
   letter-spacing: .06em;
   width: max-content;
 }
-.home-root .marquee-impact { font-family: Impact, 'Arial Narrow', sans-serif; }
-.home-root .marquee-londrina { font-family: var(--font-londrina), Impact, sans-serif; }
-.home-root .marquee-sep { color: var(--home-lime); font-family: Impact, sans-serif; }
+.home-root .marquee-impact { font-family: Impact, var(--font-archivo-black), 'Arial Narrow', sans-serif; }
+.home-root .marquee-londrina { font-family: var(--font-londrina), Impact, var(--font-archivo-black), sans-serif; }
+.home-root .marquee-sep { color: var(--home-lime); font-family: Impact, var(--font-archivo-black), sans-serif; }
 /* .home-root .marquee:hover .marquee-track { animation-play-state: paused; } */
 @keyframes marquee { to { transform: translateX(-50%); } }
 
@@ -499,7 +499,7 @@
 .home-root .project-image { will-change: transform; }
 
 /* Helpers que la sección necesita (fuente Impact y outline lima) */
-.home-root .font-impact { font-family: Impact, 'Arial Narrow', sans-serif; }
+.home-root .font-impact { font-family: Impact, var(--font-archivo-black), 'Arial Narrow', sans-serif; }
 .home-root .text-outline-lime-2 { color: transparent; -webkit-text-stroke: 2px var(--home-lime); }
 
 /* Intro / outro — tamaño de section-heading h2; fuente y em los da .home-root h2 */

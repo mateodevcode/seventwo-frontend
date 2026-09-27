@@ -4,6 +4,7 @@ import {
   Bangers,
   Anton,
   Londrina_Outline,
+  Archivo_Black,
 } from "next/font/google";
 import "./globals.css";
 
@@ -44,6 +45,12 @@ const geistLondrina = Londrina_Outline({
   variable: "--font-geist-londrina",
   subsets: ["latin"],
   weight: ["400"],
+});
+
+const geistArchivoBlack = Archivo_Black({
+  variable: "--font-archivo-black",
+  subsets: ["latin"],
+  weight: "400", // revisá qué weights tiene disponibles en fonts.google.com antes de pedir otros
 });
 
 export const metadata = {
@@ -94,7 +101,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} ${geistMontserrat.variable} ${geistPoppins.variable} ${geistBangers.variable} ${geistAnton.variable} ${geistLondrina.variable} antialiased `}
+      className={`${geistSans.variable} ${geistMono.variable} ${geistMontserrat.variable} ${geistPoppins.variable} ${geistBangers.variable} ${geistAnton.variable} ${geistLondrina.variable} ${geistArchivoBlack.variable} antialiased `}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

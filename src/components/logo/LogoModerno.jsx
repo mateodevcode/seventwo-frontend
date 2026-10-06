@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { icon_logo } from "@/data/logo";
+import "./LogoModerno.css";
 
-const LogoModerno = ({ color }) => {
+const LogoModerno = ({ href = "/", onClick }) => {
   return (
     <Link
       className="brand flex items-center select-none gap-1"
-      href="#inicio"
+      href={href}
+      onClick={onClick}
       aria-label="Seventwo Technologies, inicio"
     >
       <Image

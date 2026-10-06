@@ -38,21 +38,6 @@
   left: 50%;
   transform: translateX(-50%);
 }
-/* .home-root .brand {
-  align-items: center;
-  display: flex;
-  font-size: 12px;
-  font-weight: 800;
-  gap: 9px;
-  letter-spacing: .16em;
-}
-.home-root .brand-logo {
-  height: 28px;
-  width: 28px;
-  object-fit: contain;
-  display: block;
-}
-.home-root .brand-dot { color: var(--home-lime); } */
 .home-root .nav-links {
   align-items: center;
   display: flex;
@@ -61,74 +46,7 @@
   color: var(--home-muted);
 }
 
-.home-root .brand {
-  align-items: center;
-  display: flex;
-  font-size: 12px;
-  font-weight: 800;
-  gap: 9px;
-  letter-spacing: .16em;
-}
-.home-root .brand-logo {
-  height: 28px;
-  width: 28px;
-  object-fit: contain;
-  display: block;
-}
-
-/* --- Texto base: siempre blanco, nunca desaparece --- */
-.home-root .brand-text {
-  position: relative;
-  display: inline-block;
-  color: #fff;
-}
-
-/* --- Capa del brillo: invisible en reposo, barre en diagonal en hover --- */
-.home-root .brand-text::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(
-    115deg,
-    transparent 0%,
-    var(--home-lime) 50%,
-    transparent 0%
-  );
-  background-size: 250% 100%;
-  background-position: 250% 0;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-
-.home-root .brand:hover .brand-text::after {
-  animation: brand-shine 0.9s ease-out forwards;
-}
-
-@keyframes brand-shine {
-  from { background-position: 250% 0; }
-  to   { background-position: -50% 0; }
-}
-
-/* --- Punto: círculo grande que se achica al final del barrido --- */
-.home-root .brand-dot {
-  display: inline-block;
-  color: var(--home-lime);
-  transform-origin: center;
-}
-
-/* .home-root .brand:hover .brand-dot {
-  animation: brand-dot-pulse 0.6s ease-out forwards;
-  animation-delay: 0.65s;
-}
-
-@keyframes brand-dot-pulse {
-  0%   { transform: scale(1); }
-  35%  { transform: scale(5.4); }
-  100% { transform: scale(1); }
-} */
+/* Brand: estilos en @/components/logo/LogoModerno.css (fuente única) */
 
 .home-root .nav-links a:hover,
 .home-root .footer a:hover,

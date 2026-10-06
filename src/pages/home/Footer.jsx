@@ -1,6 +1,5 @@
 import BotonArriba from "@/components/boton/BotonArriba";
 import LogoModerno from "@/components/logo/LogoModerno";
-import { Mail } from "lucide-react";
 import BolaAnimada from "./components/BolaAnimada";
 import Link from "next/link";
 import {

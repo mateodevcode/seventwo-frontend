@@ -12,6 +12,7 @@ export default function SiteHeader() {
     ["Servicios", "#servicios"],
     ["Nosotros", "#nosotros"],
     ["Recursos", "#recursos"],
+    ["Cliente", "/area-cliente"],
   ];
 
   return (

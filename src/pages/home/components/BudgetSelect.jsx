@@ -1,10 +1,20 @@
 "use client";
 
 import { Fragment } from "react";
-import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from "@headlessui/react";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+  Transition,
+} from "@headlessui/react";
 import { ChevronDown } from "lucide-react";
 
-export const BUDGET_OPTIONS = ["Por definir", "Menos de $10M COP", "Más de $10M COP"];
+export const BUDGET_OPTIONS = [
+  "Por definir",
+  "Menos de $10M COP",
+  "Más de $10M COP",
+];
 export const BUDGET_PLACEHOLDER = "Selecciona un rango";
 
 export default function BudgetSelect({ value, onChange }) {
@@ -13,8 +23,13 @@ export default function BudgetSelect({ value, onChange }) {
       {({ open }) => (
         <div className="relative">
           <ListboxButton className="flex w-full items-center justify-between gap-3 border-b border-(--home-line) bg-transparent py-3 text-left text-white outline-none focus:border-(--home-lime)">
-            <span className={value ? "text-white" : "text-(--home-muted)"}>{value || BUDGET_PLACEHOLDER}</span>
-            <ChevronDown aria-hidden="true" className={`h-[15px] w-[15px] shrink-0 text-(--home-muted) transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+            <span className={value ? "text-white" : "text-(--home-muted)"}>
+              {value || BUDGET_PLACEHOLDER}
+            </span>
+            <ChevronDown
+              aria-hidden="true"
+              className={`h-3.75 w-3.75 shrink-0 text-(--home-muted) transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            />
           </ListboxButton>
 
           <Transition

@@ -1,0 +1,61 @@
+/* Logo SEVENTWO — fuente única de los estilos brand.
+   Lo importan las páginas que usan LogoModerno (home, área cliente).
+   Usa var(--home-lime) con fallback para funcionar dentro y fuera de .home-root. */
+
+.brand {
+  align-items: center;
+  display: flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 9px;
+  letter-spacing: 0.16em;
+}
+.brand-logo {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  display: block;
+}
+
+/* --- Texto base: siempre blanco, nunca desaparece --- */
+.brand-text {
+  position: relative;
+  display: inline-block;
+  color: #fff;
+}
+
+/* --- Capa del brillo: invisible en reposo, barre en diagonal en hover --- */
+.brand-text::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    115deg,
+    transparent 0%,
+    var(--home-lime, #ffff00) 50%,
+    transparent 0%
+  );
+  background-size: 250% 100%;
+  background-position: 250% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand:hover .brand-text::after {
+  animation: brand-shine 0.9s ease-out forwards;
+}
+
+@keyframes brand-shine {
+  from { background-position: 250% 0; }
+  to { background-position: -50% 0; }
+}
+
+/* --- Punto lima --- */
+.brand-dot {
+  display: inline-block;
+  color: var(--home-lime, #ffff00);
+  transform-origin: center;
+}

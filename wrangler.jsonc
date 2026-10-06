@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "seventwo-frontend",
+  "compatibility_date": "2026-10-01",
+  "observability": { "enabled": true },
+  "routes": [
+    {
+      "pattern": "new.seventwo.tech",
+      "custom_domain": true,
+    },
+  ],
+}

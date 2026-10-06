@@ -50,7 +50,7 @@ const geistLondrina = Londrina_Outline({
 const geistArchivoBlack = Archivo_Black({
   variable: "--font-archivo-black",
   subsets: ["latin"],
-  weight: "400", // revisá qué weights tiene disponibles en fonts.google.com antes de pedir otros
+  weight: "400", 
 });
 
 export const metadata = {

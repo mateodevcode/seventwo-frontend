@@ -486,7 +486,7 @@
   .home-root .contact { padding-bottom: 85px; padding-top: 85px; }
   .home-root .footer-links { gap: 40px; grid-template-columns: 1fr 1fr; margin-top: 55px; }
   .home-root .footer-links > div:last-child { grid-column: span 2; }
-  .home-root .footer-bottom { gap: 12px; flex-direction: row; margin-top: 50px; }
+  .home-root .footer-bottom { gap: 12px; flex-direction: column; margin-top: 50px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .home-root .marquee-track { animation: none; }

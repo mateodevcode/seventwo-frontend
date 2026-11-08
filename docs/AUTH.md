@@ -134,14 +134,18 @@ Hay un job de limpieza cada hora (`setInterval` o cron) que borra los `auth_codi
 - El OTP también se exige cuando el usuario entra con Google, **solo si `otp_activo = true`**.
 
 ### 5.4 Google (Authorization Code, en el servidor)
-1. Botón → `GET api.seventwo.tech/auth/google?next=/area-cliente`. El backend firma un `state` con `{ next, nonce }` (JWT de 10 min) y redirige a Google con el scope `openid email profile`.
-2. `GET /auth/google/callback?code&state`: se verifica el `state`, se intercambia el `code` por el token y se piden los datos a `userinfo`. Si `email_verified` es falso, se rechaza.
-3. Si el usuario no existe, se crea con `provider = 'google'`, `email_verificado = true` y sin contraseña. Si existe, se vincula el `google_id` (aceptable porque Google verifica el email).
+1. Botón → navegación a `GET api.seventwo.tech/auth/google?next=/area-cliente`. El backend firma un `state` con `{ next, nonce }` (JWT de 10 min), guarda el `nonce` en la cookie `g_state` (`httpOnly`, 10 min) y redirige a Google con el scope `openid email profile`.
+2. `GET /auth/google/callback?code&state`: se verifica la firma del `state` **y que su `nonce` coincida con la cookie `g_state`**. Así el callback solo vale en el navegador que inició el flujo y se evita que alguien deje a la víctima logueada en la cuenta del atacante. Después se intercambia el `code` por el token y se piden los datos a `userinfo`. Si `email_verified` no es `true`, se rechaza.
+3. La cuenta se busca primero por `google_id` y después por email.
+   - Si no existe, se crea con `provider = 'google'`, `email_verificado = true` y sin contraseña.
+   - Si existe por email, se vincula el `google_id`. Si esa cuenta local tenía el **email sin verificar**, se descarta su contraseña y se revocan sus sesiones. Esto protege del *pre-registro*: un atacante que creó la cuenta antes con el email de la víctima pierde el acceso.
+   - Si el email ya está vinculado a otro `google_id`, se responde `error=google_cuenta_distinta`.
 4. Si la cuenta está bloqueada, se redirige a `/login?error=cuenta_bloqueada`.
-5. Si `otp_activo = true`, se envía el código `otp_login` y se redirige a `/login/otp?email=...&next=...`.
-6. En otro caso se crea la sesión (cookie refresh), se guarda un `oauth_canje` y se redirige a `new.seventwo.tech/auth/google/callback?code=<uuid>&next=...`.
-7. El front llama a `POST /auth/google/canjear { code }` y recibe `{ usuario, accessToken }`.
-8. `next` solo acepta rutas internas (`/...`, nunca `//`).
+5. Si `otp_activo = true`, se envía el código `otp_login` y se redirige a `/login/otp?email=...&next=...`. El login se completa con `POST /auth/otp/verificar`.
+6. En otro caso se emite la sesión: la cookie refresh ya queda puesta y se redirige a `new.seventwo.tech/auth/google/callback?next=...`.
+7. Esa página del front llama a `POST /auth/refresh`, recibe `{ usuario, accessToken }` y navega a `next`. No hace falta ningún código de canje.
+8. `next` solo acepta rutas internas (`/...`, nunca `//` ni `/\`).
+9. Códigos de `?error=` en `/login`: `google_no_configurado`, `google_cancelado`, `google_estado_invalido`, `google_sin_codigo`, `google_codigo_invalido`, `google_perfil_invalido`, `google_email_no_verificado`, `google_cuenta_distinta`, `cuenta_bloqueada`, `email_no_enviado` y `google_error`.
 
 ### 5.5 Restablecer contraseña
 1. `POST /auth/password/solicitar { email }`. Responde **siempre** 200 con el mensaje *"Si el correo existe, te enviamos un código"*. Solo se envía el código `reset_password` si la cuenta existe.
@@ -183,7 +187,6 @@ Si el envío falla en login u OTP, se responde 500 *"No pudimos enviar el códig
 | POST | `/auth/otp/verificar` · `/auth/otp/reenviar` | — | 10 / 10 min |
 | POST | `/auth/otp/activar` · `/activar/confirmar` · `/desactivar` | ✔ | 10 / 10 min |
 | GET | `/auth/google` · `/auth/google/callback` | — | 20 / min |
-| POST | `/auth/google/canjear` | — | 20 / min |
 | POST | `/auth/password/solicitar` · `/validar` · `/restablecer` | — | 5 / 10 min |
 | PATCH | `/auth/password` | ✔ | 10 / 10 min |
 | POST | `/auth/refresh` · `/auth/logout` · `/auth/logout-todo` | cookie | 60 / min |
@@ -201,7 +204,8 @@ Middlewares: `verificarToken`, `verificarRol([...])` y `rateLimit(nombre, max, v
 6. inmobitwo tiene `check-email` y respuestas de reset que revelan si un email existe. Aquí las respuestas son genéricas.
 7. En inmobitwo el registro emite sesión sin verificar el email. Aquí primero se verifica.
 8. El `accessToken` de inmobitwo va en `localStorage`. Aquí vive en memoria; el refresh por cookie restaura la sesión.
-9. Sin Redis: rate limit y canje OAuth pasan a Postgres.
+9. Sin Redis: el rate limit pasa a Postgres y el canje OAuth desaparece (la cookie ya queda puesta en el callback).
+10. El `state` de Google se ata al navegador con la cookie `g_state` y se protege del pre-registro de cuentas (§5.4).
 
 ## 9. Frontend (seventwo-frontend)
 
@@ -214,7 +218,7 @@ Rutas nuevas en `src/app/`:
 | `/registro` | Nombre, email, contraseña y confirmación |
 | `/verificar-email` | Código de 6 dígitos |
 | `/olvide-contrasena` | Email → código → nueva contraseña (3 pasos en la misma página) |
-| `/auth/google/callback` | Canjea el `code` y redirige a `next` |
+| `/auth/google/callback` | Llama a `POST /auth/refresh` y redirige a `next` |
 | `/area-cliente/seguridad` | Activar o desactivar OTP, cambiar contraseña, cerrar todas las sesiones |
 
 - `src/lib/api.js`: `fetch` con `credentials: "include"`, añade el bearer y hace refresh automático ante un 401.

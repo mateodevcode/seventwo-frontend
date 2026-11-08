@@ -20,7 +20,8 @@ export default function RegistroForm() {
   const next = sanearNext(params.get("next"));
   const { estado } = useAuth();
 
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmar: "" });
+  // ?email= llega desde el email de una solicitud de presupuesto ("Crea tu cuenta").
+  const [form, setForm] = useState({ name: "", email: params.get("email") ?? "", password: "", confirmar: "" });
   const [tocado, setTocado] = useState({});
   const [error, setError] = useState("");
   const [enviando, setEnviando] = useState(false);

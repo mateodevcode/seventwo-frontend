@@ -16,7 +16,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SOCKET_URL=wss://ws.seventwo.tech
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+    NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL \
     NEXT_TELEMETRY_DISABLED=1
 RUN test -n "$NEXT_PUBLIC_API_URL" || (echo "❌ Falta NEXT_PUBLIC_API_URL (build-arg)" && exit 1)
 RUN pnpm build

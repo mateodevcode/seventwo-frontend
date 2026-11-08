@@ -100,6 +100,60 @@ Notas:
 - Evita el carácter `$` en los valores (docker compose lo interpreta); si lo necesitas, escríbelo como `$$`.
 - Si prefieres editarlos a mano en el VPS, parte de `.env.example`.
 
+### 2.6 Notificaciones de presupuestos (opcional; cada canal se activa por separado)
+Sin estas variables, las solicitudes funcionan igual: se guardan, llegan los emails y aparecen en la campana al recargar. Cada canal se enciende cuando su variable tiene valor (ver `docs/PRESUPUESTOS.md` §6). El `seventwo-backend/.env.vps` ya trae los nombres, las **claves VAPID generadas** y el **buzón** `EQUIPO_EMAIL=info@seventwo.tech`. Copia esas líneas nuevas al `.env` del backend en el VPS.
+
+**Web Push (app instalada).** Basta con `VAPID_PUBLIC_KEY` y `VAPID_PRIVATE_KEY`, que ya están en `.env.vps`. No se rotan: si cambian, cada dispositivo tiene que volver a activarse desde la campana.
+
+**Tiempo real con socket-core (ya corre en el VPS como `socket-core`).** Se configura una sola vez:
+1. Da de alta el proyecto y guarda la API key que imprime:
+
+   ```bash
+   cd ~/socket-core && python3 scripts/alta_cliente.py
+   ```
+
+   Datos del alta:
+   - nombre: `seventwo`
+   - dominios: `https://seventwo.tech, http://localhost:3000`
+   - prefijo: `seventwo:*`
+   - scopes: `publish, subscribe, manage`
+
+2. Añade `https://seventwo.tech` a `ALLOWED_ORIGINS` en el `.env` de socket-core (separado por comas de los orígenes que ya tenga) y reinícialo:
+
+   ```bash
+   docker compose up -d
+   ```
+
+3. En el `.env` del backend de Seventwo:
+
+   ```
+   SOCKET_CORE_URL=http://socket-core:3005   # red interna central_network, sin pasar por nginx
+   SOCKET_CORE_API_KEY=sc_live_...           # la del paso 1
+   SOCKET_CORE_CANAL=seventwo:notificaciones
+   ```
+
+   El canal lo crea el backend la primera vez. El navegador se conecta a `wss://ws.seventwo.tech`, que es `NEXT_PUBLIC_SOCKET_URL` en el `.env.production` del frontend.
+
+**Telegram (grupo del equipo).**
+1. En Telegram, crea un bot con **@BotFather** (`/newbot`) y copia el token.
+2. Crea un grupo con el equipo, añade el bot y escribe cualquier mensaje en el grupo.
+3. Abre esta URL en el navegador, con tu token:
+
+   ```
+   https://api.telegram.org/bot<TOKEN>/getUpdates
+   ```
+
+   En la respuesta, `chat.id` es el id del grupo; es un número negativo, como `-100…`.
+4. En el `.env` del backend: `TELEGRAM_BOT_TOKEN=…` y `TELEGRAM_CHAT_ID=-100…`.
+
+Tras cambiar el `.env` del backend no hace falta rebuild:
+
+```bash
+cd /srv/infra/seventwo/seventwo-backend && docker compose up -d
+```
+
+Al arrancar, el log dice qué canales siguen desactivados (`ℹ️  Canales de aviso desactivados: …`).
+
 ## 3. Desplegar
 
 **Orden: primero el backend.** El frontend necesita la API para funcionar, y conviene que certbot no se ejecute dos veces a la vez.

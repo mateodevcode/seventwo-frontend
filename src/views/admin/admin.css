@@ -78,3 +78,33 @@
   .cliente-root .admin-row > :nth-child(5) { display: none; }
   .cliente-root .admin-buscar { min-width: 0; flex: 1; }
 }
+
+/* === Solicitudes (admin) === */
+/* Filas: código | solicitante | proyecto | presupuesto | estado | llegó */
+.cliente-root .admin-sol-row { grid-template-columns: 0.7fr 2fr 1.1fr 1fr 1fr 0.8fr; }
+.cliente-root .admin-chips button {
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  border: 1px solid var(--cliente-line);
+  background: var(--cliente-card);
+  padding: 18px 20px;
+}
+.cliente-root .admin-chips button.activo { border-color: var(--cliente-lime); box-shadow: 4px 4px 0 var(--cliente-lime); }
+.cliente-root .admin-sol-controles { display: flex; flex-direction: column; gap: 10px; min-width: 210px; }
+.cliente-root .admin-sol-controles label { display: flex; flex-direction: column; gap: 6px; font: 10px monospace; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cliente-muted); }
+.cliente-root .admin-sol-controles .admin-select { height: 36px; }
+.cliente-root .admin-sol-tipo { display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px; color: var(--cliente-fg); }
+.cliente-root .admin-sol-tipo label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.cliente-root .admin-sol-tipo input { accent-color: var(--cliente-lime); }
+.cliente-root .admin-sol-tipo small { color: var(--cliente-muted); }
+
+@media (max-width: 900px) {
+  .cliente-root .admin-sol-row { grid-template-columns: 0.8fr 1.8fr 1fr; }
+  .cliente-root .admin-sol-row > :nth-child(3),
+  .cliente-root .admin-sol-row > :nth-child(4),
+  .cliente-root .admin-sol-row > :nth-child(6) { display: none; }
+  .cliente-root .solicitud-cabecera { flex-direction: column; }
+  .cliente-root .admin-sol-controles { width: 100%; }
+}

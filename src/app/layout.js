@@ -71,7 +71,10 @@ export const metadata = {
   icons: {
     icon: "/logo/favicon.ico",
     shortcut: "/logo/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+  // PWA en iPhone/iPad: pantalla completa al abrirla desde el inicio (Web Push iOS ≥ 16.4).
+  appleWebApp: { capable: true, title: "Seventwo", statusBarStyle: "black-translucent" },
   metadataBase: new URL("https://seventwo.tech"),
   openGraph: {
     title: "Seventwo Technologies",

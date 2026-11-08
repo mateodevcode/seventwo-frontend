@@ -439,3 +439,23 @@
   display: block;
   will-change: transform;
 }
+/* === Formulario de presupuesto (docs/PRESUPUESTOS.md §7.1) === */
+.home-root .quote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 21px; }
+@media (max-width: 640px) { .home-root .quote-grid { grid-template-columns: 1fr; } }
+.home-root .quote-form input[aria-invalid="true"],
+.home-root .quote-form textarea[aria-invalid="true"] { border-color: #ff6b81; }
+.home-root .quote-error { color: #ff6b81; font: 12px Arial, sans-serif; text-transform: none; margin: 0; }
+.home-root .quote-check { flex-direction: row !important; align-items: flex-start; gap: 10px !important; cursor: pointer; text-transform: none !important; font: 13px Arial, sans-serif !important; color: var(--home-muted); }
+.home-root .quote-check input { width: 16px; height: 16px; margin-top: 1px; accent-color: var(--home-lime); flex: 0 0 auto; }
+.home-root .quote-trampa { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }
+
+.home-root .quote-ok { display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--home-line); background: var(--home-card); padding: 30px; box-shadow: 8px 8px 0 #00a49c; }
+.home-root .quote-ok > svg { width: 34px; height: 34px; color: var(--home-lime); }
+.home-root .quote-ok h3 { margin: 0; font-family: Impact, var(--font-anton), sans-serif; font-weight: 400; font-size: 32px; text-transform: uppercase; color: var(--home-fg); }
+.home-root .quote-ok p { margin: 0; color: var(--home-muted); line-height: 1.55; }
+.home-root .quote-ok strong { color: var(--home-fg); }
+.home-root .quote-ok-acciones { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 6px; }
+.home-root .quote-ok-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--home-lime); color: var(--home-ink) !important; padding: 12px 16px; font-weight: 700; text-transform: uppercase; font-size: 13px; text-decoration: none; }
+.home-root .quote-ok-cta svg { width: 16px; height: 16px; }
+.home-root .quote-ok-otra { background: none; border: 0; color: var(--home-lime); cursor: pointer; font-size: 13px; padding: 0; }
+.home-root .quote-ok-otra:hover { text-decoration: underline; }

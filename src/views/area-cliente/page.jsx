@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import Overview from "./Overview";
@@ -9,9 +10,9 @@ import Payments from "./Payments";
 import Service from "./Service";
 import Support from "./Support";
 import Help from "./Help";
-import Quote from "./Quote";
 import Seguridad from "@/components/area-cliente/Seguridad";
 import Perfil from "@/components/area-cliente/Perfil";
+import Solicitudes from "@/components/area-cliente/Solicitudes";
 import { useAuth } from "@/components/auth/AuthProvider";
 import "./area-cliente.css";
 import "@/components/logo/LogoModerno.css";
@@ -20,14 +21,22 @@ import { navegacionPara } from "@/data/data.area-cliente";
 
 export default function AreaClientePage() {
   const { usuario } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
   // Secciones según el rol: un "usuario" solo ve perfil, presupuesto, seguridad y ayuda.
   const items = navegacionPara(usuario?.rol ?? "usuario");
   const permitido = (id) => items.some((item) => item.id === id);
 
-  const [elegido, setActive] = useState(null);
-  // Sección activa: la elegida si el rol la permite; si no, la primera disponible
-  // (resumen para clientes, perfil para usuarios).
+  // La URL manda (?seccion=cotizar&solicitud=S-0012): así los enlaces de emails y
+  // notificaciones abren la sección correcta y "atrás" del navegador funciona.
+  const elegido = params.get("seccion");
+  const solicitud = params.get("solicitud");
   const active = elegido && permitido(elegido) ? elegido : items[0]?.id;
+  const setActive = useCallback(
+    (id) => router.push(`${pathname}?seccion=${encodeURIComponent(id)}`, { scroll: false }),
+    [router, pathname],
+  );
   const contentRef = useRef(null);
   const current = items.find((item) => item.id === active) ?? { label: "" };
 
@@ -50,7 +59,7 @@ export default function AreaClientePage() {
             {active === "soporte" && <Support />}
             {active === "seguridad" && <Seguridad />}
             {active === "ayuda" && <Help />}
-            {active === "cotizar" && <Quote />}
+            {active === "cotizar" && <Solicitudes key={solicitud ?? "lista"} codigoInicial={solicitud} />}
           </div>
         </section>
       </div>

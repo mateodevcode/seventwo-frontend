@@ -1,6 +1,12 @@
 # Solicitudes de presupuesto y notificaciones — plan y maquetas
 
-Estado: **planificación**. Todavía no hay nada implementado.
+Estado: **P1–P5 implementados** (08 nov 2026). La activación de socket-core, Telegram y Web Push en el VPS está en `DEPLOY.md` §2.6.
+
+**Decisiones (08 nov 2026):**
+- **Respuestas:** conversación con notas internas.
+- **Telegram:** grupo del equipo.
+- **Email de avisos al equipo:** un buzón fijo (`EQUIPO_EMAIL`, por defecto `info@seventwo.tech`), no un email por persona. Los emails al solicitante llevan `Reply-To` a ese buzón, así que si contesta por correo le llega al equipo.
+- **Canales opcionales:** cada salida (socket-core, push, Telegram) se activa sola cuando su variable de entorno está definida. Sin ellas, todo lo demás funciona igual.
 
 ## 1. El flujo en una línea
 
@@ -135,9 +141,9 @@ Todo se lanza en paralelo con `Promise.allSettled`: los fallos se registran y no
 
 | Evento | Equipo (admin + superadmin) | Solicitante |
 |---|---|---|
-| Solicitud nueva | BD · socket · push · email · Telegram | Email de confirmación (+ BD/socket/push si tiene cuenta) |
+| Solicitud nueva | BD · socket · push (cada admin) · email al buzón · Telegram | Email de confirmación (+ BD/socket/push si tiene cuenta) |
 | Respuesta del equipo | — | **Email siempre** · BD · socket · push si tiene cuenta |
-| El cliente contesta | BD · socket · push · email · Telegram | — |
+| El cliente contesta | BD · socket · push (cada admin) · email al buzón · Telegram | — |
 | Cambio a aceptada/rechazada | — | Email · BD · socket · push |
 
 ### socket-core (ya corre en el VPS: `wss://ws.seventwo.tech/ws`)

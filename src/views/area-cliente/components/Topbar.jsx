@@ -1,5 +1,6 @@
-import { Bell, ChevronDown, Search } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { iniciales, useAuth } from "@/components/auth/AuthProvider";
+import Campana from "@/components/notificaciones/Campana";
 
 export default function Topbar({ title, seccion = "Área de cliente" }) {
   const { usuario } = useAuth();
@@ -11,13 +12,7 @@ export default function Topbar({ title, seccion = "Área de cliente" }) {
         <strong>{title}</strong>
       </div>
       <div className="topbar-actions">
-        <button className="icon-button" type="button" aria-label="Buscar">
-          <Search aria-hidden="true" />
-        </button>
-        <button className="icon-button notification" type="button" aria-label="Notificaciones">
-          <Bell aria-hidden="true" />
-          <i aria-hidden="true" />
-        </button>
+        {usuario && <Campana />}
         <div className="top-avatar" aria-hidden="true">
           {iniciales(usuario?.name)}
         </div>

@@ -3,6 +3,7 @@ import {
   FileText,
   Headphones,
   LayoutDashboard,
+  LockKeyhole,
   Sparkles,
   UserRound,
   WalletCards,
@@ -15,6 +16,7 @@ export const navigation = [
   { id: "pagos", label: "Pagos", icon: WalletCards },
   { id: "servicio", label: "Servicio contratado", icon: Sparkles },
   { id: "soporte", label: "Soporte", icon: Headphones, badge: "1" },
+  { id: "seguridad", label: "Seguridad", icon: LockKeyhole },
   { id: "ayuda", label: "Ayuda", icon: CircleHelp },
 ];
 

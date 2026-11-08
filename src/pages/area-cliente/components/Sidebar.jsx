@@ -1,8 +1,14 @@
-import { MoreHorizontal, Settings, ShieldCheck } from "lucide-react";
-import { clientUser, navigation } from "@/data/data.area-cliente";
+import { LogOut, Settings, ShieldCheck } from "lucide-react";
+import { navigation } from "@/data/data.area-cliente";
 import LogoModerno from "@/components/logo/LogoModerno";
+import { iniciales, useAuth } from "@/components/auth/AuthProvider";
 
 export default function Sidebar({ active, onNavigate }) {
+  const { usuario, cerrarSesion } = useAuth();
+
+  // Al quedar sin sesión, RequiereSesion redirige a /login.
+  const salir = () => cerrarSesion().catch(() => {});
+
   return (
     <aside
       className="portal-sidebar"
@@ -25,7 +31,7 @@ export default function Sidebar({ active, onNavigate }) {
               type="button"
               className={isActive ? "nav-item active" : "nav-item"}
               aria-current={isActive ? "page" : undefined}
-              onClick={() => onNavigate(item.id)}
+              onClick={() => onNavigate?.(item.id)}
             >
               <Icon aria-hidden="true" />
               <span>{item.label}</span>
@@ -39,27 +45,35 @@ export default function Sidebar({ active, onNavigate }) {
         <div className="sidebar-help">
           <ShieldCheck aria-hidden="true" />
           <div>
-            <strong>Tu cuenta está protegida</strong>
-            <span>Datos cifrados y seguros</span>
+            <strong>{usuario?.otp_activo ? "Verificación en dos pasos activa" : "Protege tu cuenta"}</strong>
+            <span>{usuario?.otp_activo ? "Tu cuenta está protegida" : "Activa la verificación en dos pasos"}</span>
           </div>
         </div>
         <button
           type="button"
           className="nav-item"
-          onClick={() => onNavigate("datos")}
+          onClick={() => onNavigate?.("seguridad")}
         >
           <Settings aria-hidden="true" />
           <span>Configuración</span>
         </button>
         <div className="user-mini">
           <div className="avatar" aria-hidden="true">
-            {clientUser.initials}
+            {iniciales(usuario?.name)}
           </div>
           <div>
-            <strong>{clientUser.name}</strong>
-            <span>{clientUser.email}</span>
+            <strong>{usuario?.name}</strong>
+            <span>{usuario?.email}</span>
           </div>
-          <MoreHorizontal aria-hidden="true" />
+          <button
+            type="button"
+            className="icon-button"
+            onClick={salir}
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+          >
+            <LogOut aria-hidden="true" />
+          </button>
         </div>
       </div>
     </aside>

@@ -1,7 +1,8 @@
 import { Bell, ChevronDown, Search } from "lucide-react";
-import { clientUser } from "@/data/data.area-cliente";
+import { iniciales, useAuth } from "@/components/auth/AuthProvider";
 
 export default function Topbar({ title }) {
+  const { usuario } = useAuth();
   return (
     <header className="topbar">
       <div className="breadcrumbs">
@@ -18,7 +19,7 @@ export default function Topbar({ title }) {
           <i aria-hidden="true" />
         </button>
         <div className="top-avatar" aria-hidden="true">
-          {clientUser.initials}
+          {iniciales(usuario?.name)}
         </div>
         <ChevronDown className="chevron" aria-hidden="true" />
       </div>

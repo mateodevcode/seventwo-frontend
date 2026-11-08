@@ -11,6 +11,7 @@ import Service from "./Service";
 import Support from "./Support";
 import Help from "./Help";
 import Quote from "./Quote";
+import Seguridad from "@/components/area-cliente/Seguridad";
 import "./area-cliente.css";
 import "@/components/logo/LogoModerno.css";
 import { scrollbarStyles } from "@/data/data.styles.scrollbar";
@@ -40,6 +41,7 @@ export default function AreaClientePage() {
             {active === "pagos" && <Payments onNavigate={setActive} />}
             {active === "servicio" && <Service />}
             {active === "soporte" && <Support />}
+            {active === "seguridad" && <Seguridad />}
             {active === "ayuda" && <Help />}
             {active === "cotizar" && <Quote />}
           </div>

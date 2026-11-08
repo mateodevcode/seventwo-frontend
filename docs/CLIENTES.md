@@ -1,6 +1,6 @@
 # Clientes, proyectos, contratos, cobros, pagos y soporte — plan y maquetas
 
-Estado: **F1 implementada** (08 nov 2026): ficha de cliente, catálogo, proyectos con hitos, "Convertir en proyecto", historial, Resumen y Mis proyectos reales, y datos de facturación en el perfil (migración `005_clientes_proyectos.sql`). Cuentas de cobro, pagos y soporte muestran "Muy pronto" hasta F3–F5. Sigue a `PRESUPUESTOS.md`: este plan empieza donde termina una solicitud **aceptada**.
+Estado: **F1 implementada** (08 nov 2026): ficha de cliente, catálogo, proyectos con hitos, "Convertir en proyecto", historial, Resumen y Mis proyectos reales, y datos de facturación en el perfil (migración `005_clientes_proyectos.sql`). **F2 implementada**: contratos en PDF guardados en S3, en la carpeta privada `seventwo/privado/contratos/…`; en la BD solo van la clave y la huella SHA-256 (migración `006_contratos.sql`). Cada contrato puede ser un borrador o subirse ya firmado fuera. El equipo lo envía con una nota y el cliente lo acepta escribiendo su nombre; se guardan la fecha, la IP, el navegador y la huella, que se verifica contra S3 antes de aceptar. Cada nueva versión reemplaza a la vigente. Ver `DEPLOY.md` §2.7 (política del bucket). Cuentas de cobro, pagos y soporte muestran "Muy pronto" hasta F3–F5. Sigue a `PRESUPUESTOS.md`: este plan empieza donde termina una solicitud **aceptada**.
 
 En F1, "Convertir en proyecto" también acepta solicitudes en `nueva`, `en_revision` o `respondida`, y las deja en `aceptada`. Las rechazadas y archivadas no se pueden convertir.
 

@@ -154,6 +154,32 @@ cd /srv/infra/seventwo/seventwo-backend && docker compose up -d
 
 Al arrancar, el log dice qué canales siguen desactivados (`ℹ️  Canales de aviso desactivados: …`).
 
+### 2.7 Archivos en S3 (contratos)
+El backend guarda los contratos en el bucket `seventwo` bajo `seventwo/privado/…`. En la base de datos solo guarda la clave del objeto y su huella SHA-256, nunca un link público. Para abrir un contrato, el backend comprueba la sesión y devuelve una URL firmada que caduca en 5 minutos.
+
+Variables en el `.env` del backend: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, `AWS_BUCKET` y `AWS_BUCKET_SUBFOLDER`.
+
+**La carpeta `privado/` no debe ser pública.** La política actual del bucket permite leer cualquier objeto (`s3:GetObject` sobre `seventwo/*`). Cámbiala en AWS → S3 → `seventwo` → Permisos → Política del bucket por esta: todo sigue siendo público excepto `seventwo/privado/`.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LecturaPublicaExceptoPrivado",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "NotResource": "arn:aws:s3:::seventwo/seventwo/privado/*"
+    }
+  ]
+}
+```
+
+Para comprobarlo, abre en el navegador la URL directa de un contrato, sin firma: debe responder `AccessDenied`. Las URLs firmadas que genera el backend siguen funcionando, siempre que el usuario IAM de `AWS_ACCESS_KEY_ID` tenga `s3:GetObject`, `s3:PutObject` y `s3:DeleteObject` sobre `seventwo/seventwo/privado/*`.
+
+Los PDF suben a través de la API, hasta 10 MB. Por eso `nginx/seventwo-api.conf` permite cuerpos de hasta 11 MB.
+
 ## 3. Desplegar
 
 **Orden: primero el backend.** El frontend necesita la API para funcionar, y conviene que certbot no se ejecute dos veces a la vez.

@@ -103,6 +103,54 @@
 .cliente-root .actividad-lista time { font: 11px monospace; color: var(--cliente-muted); }
 .cliente-root .actividad-lista em { font-style: normal; color: var(--cliente-muted); font-size: 11px; margin-left: 6px; }
 
+/* Contratos */
+.cliente-root .contratos { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.cliente-root .contrato-card { border: 1px solid var(--cliente-line); background: var(--cliente-panel); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.cliente-root .contrato-card.apagado { opacity: 0.6; }
+.cliente-root .contrato-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.cliente-root .contrato-cabecera strong { display: block; font-size: 14px; color: var(--cliente-fg); }
+.cliente-root .contrato-cabecera small { display: block; margin-top: 4px; color: var(--cliente-muted); font-size: 11px; line-height: 1.5; }
+.cliente-root .contrato-acciones { display: flex; flex-wrap: wrap; gap: 18px; }
+.cliente-root .contrato-nota { margin: 0; padding: 10px 12px; border-left: 3px solid #00a49c; background: rgba(0, 164, 156, 0.08); white-space: pre-wrap; font-size: 13px; color: #d3c9e2; }
+.cliente-root .contrato-ok { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; color: #00a49c; }
+.cliente-root .contrato-ok svg { width: 16px; height: 16px; flex: 0 0 auto; }
+.cliente-root .contrato-aceptar,
+.cliente-root .contrato-subir,
+.cliente-root .contrato-enviar { display: flex; flex-direction: column; gap: 12px; }
+.cliente-root .contrato-aceptar .button { align-self: flex-start; }
+.cliente-root .contrato-evidencia { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 12px; }
+.cliente-root .contrato-evidencia dt { color: var(--cliente-muted); font: 10px monospace; text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; }
+.cliente-root .contrato-evidencia dd { margin: 0; color: var(--cliente-fg); overflow-wrap: anywhere; }
+.cliente-root .contrato-evidencia .mono { font: 11px monospace; color: var(--cliente-muted); }
+.cliente-root .contrato-historial summary { cursor: pointer; color: var(--cliente-muted); font-size: 12px; margin-bottom: 8px; }
+.cliente-root .contrato-historial .text-button { display: flex; margin: 6px 0; }
+.cliente-root .contrato-file { color: var(--cliente-fg); font-size: 13px; padding: 10px 0; }
+.cliente-root .pill.contrato-enviado { background: #ff6b81; border-color: #ff6b81; color: #100b17; }
+.cliente-root .pill.contrato-aceptado,
+.cliente-root .pill.contrato-firmado_fuera { background: #00a49c; border-color: #00a49c; color: #100b17; }
+.cliente-root .pill.contrato-borrador { background: transparent; border: 1px dashed var(--cliente-lime); color: var(--cliente-lime); }
+.cliente-root .pill.contrato-reemplazado { background: transparent; border: 1px solid var(--cliente-line); color: var(--cliente-muted); }
+
+.cliente-root .aviso-contrato {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 16px 20px;
+  text-align: left;
+  font: inherit;
+  color: var(--cliente-fg);
+  cursor: pointer;
+  border: 1px solid #ff6b81;
+  background: rgba(255, 107, 129, 0.08);
+  box-shadow: 4px 4px 0 #ff6b81;
+}
+.cliente-root .aviso-contrato svg { width: 18px; height: 18px; flex: 0 0 auto; color: #ff6b81; }
+.cliente-root .aviso-contrato span { flex: 1; }
+.cliente-root .aviso-contrato strong { display: block; font-size: 14px; }
+.cliente-root .aviso-contrato small { display: block; margin-top: 3px; color: var(--cliente-muted); font-size: 12px; }
+
 @media (max-width: 1000px) {
   .cliente-root .proyecto-meta { grid-template-columns: repeat(2, 1fr); }
   .cliente-root .proyecto-cols { grid-template-columns: 1fr; }

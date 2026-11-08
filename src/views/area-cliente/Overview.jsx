@@ -45,7 +45,7 @@ export default function Overview({ onNavigate, onAbrirProyecto }) {
     return () => { vigente = false; };
   }, [version]);
   useEffect(() => {
-    const fn = (ev) => /^(proyecto_|solicitud_)/.test(ev.detail?.tipo ?? "") && setVersion((v) => v + 1);
+    const fn = (ev) => /^(proyecto_|solicitud_|contrato_)/.test(ev.detail?.tipo ?? "") && setVersion((v) => v + 1);
     window.addEventListener("seventwo:notificacion", fn);
     return () => window.removeEventListener("seventwo:notificacion", fn);
   }, []);
@@ -65,6 +65,17 @@ export default function Overview({ onNavigate, onAbrirProyecto }) {
           </button>
         }
       />
+
+      {r?.contratos_pendientes?.map((c) => (
+        <button key={c.id} type="button" className="aviso-contrato" onClick={() => onAbrirProyecto(c.proyecto_codigo)}>
+          <FileText aria-hidden="true" />
+          <span>
+            <strong>Tienes un contrato pendiente de aceptar</strong>
+            <small>{c.proyecto_codigo} · {c.titulo} · versión {c.version}</small>
+          </span>
+          <ArrowUpRight aria-hidden="true" />
+        </button>
+      ))}
 
       <div className="overview-grid">
         <div className="welcome-card">
@@ -164,8 +175,8 @@ export default function Overview({ onNavigate, onAbrirProyecto }) {
           {r?.actividad?.length ? (
             r.actividad.map((a) => (
               <div className="activity-item" key={a.id}>
-                <div className={`activity-icon ${a.entidad === "proyecto" ? "paid" : "message"}`}>
-                  {a.entidad === "proyecto" ? <Check aria-hidden="true" /> : <FileText aria-hidden="true" />}
+                <div className={`activity-icon ${a.entidad === "cliente" ? "message" : "paid"}`}>
+                  {a.entidad === "contrato" ? <FileText aria-hidden="true" /> : a.entidad === "proyecto" ? <Check aria-hidden="true" /> : <UserRound aria-hidden="true" />}
                 </div>
                 <div>
                   <strong>{a.descripcion}</strong>

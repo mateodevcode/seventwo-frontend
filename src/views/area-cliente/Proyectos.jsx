@@ -9,12 +9,13 @@ import { api } from "@/lib/api";
 import { fecha, valorProyecto, MODELOS_COBRO } from "@/lib/clientes";
 import { Alerta } from "@/components/auth/ui";
 import { Hitos, MetaProyecto, PillProyecto, Progreso } from "@/components/clientes/Proyecto";
+import ContratosCliente from "@/components/clientes/ContratosCliente";
 import "@/components/clientes/clientes.css";
 
 // Recarga cuando llega un aviso de proyecto (estado, hito…).
 function useAvisosProyecto(recargar) {
   useEffect(() => {
-    const fn = (ev) => ev.detail?.tipo?.startsWith("proyecto_") && recargar();
+    const fn = (ev) => /^(proyecto_|contrato_)/.test(ev.detail?.tipo ?? "") && recargar();
     window.addEventListener("seventwo:notificacion", fn);
     return () => window.removeEventListener("seventwo:notificacion", fn);
   }, [recargar]);
@@ -126,7 +127,7 @@ function Detalle({ codigo, onVolver, onNavigate }) {
                 </div>
               ) : <p className="admin-vacio">Se detallará en el contrato.</p>}
               <p className="eyebrow" style={{ marginTop: 24 }}>Contrato</p>
-              <p className="heading-description">Muy pronto podrás leer y aceptar el contrato desde aquí.</p>
+              <ContratosCliente contratos={p.contratos} onCambio={() => setVersion((v) => v + 1)} />
               {p.solicitud_codigo && (
                 <>
                   <p className="eyebrow" style={{ marginTop: 24 }}>Origen</p>

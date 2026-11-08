@@ -15,6 +15,7 @@ import FichaForm from "@/components/clientes/FichaForm";
 import FichaVista from "@/components/clientes/FichaVista";
 import { Hitos, ListaActividad, MetaProyecto, PillCliente, PillProyecto, Progreso } from "@/components/clientes/Proyecto";
 import ProyectoForm from "./ProyectoForm";
+import ContratosAdmin from "./ContratosAdmin";
 import "@/components/area-cliente/solicitudes.css";
 import "@/components/clientes/clientes.css";
 
@@ -139,11 +140,19 @@ function ProyectoAdmin({ id, onVolver }) {
   const [ok, setOk] = useState("");
   const [editando, setEditando] = useState(false);
   const servicios = useServicios();
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let vigente = true;
     api(`/admin/proyectos/${id}`, { auth: true }).then((r) => vigente && setP(r.data)).catch((e) => vigente && setError(e.message));
     return () => { vigente = false; };
+  }, [id, version]);
+
+  // El cliente acepta el contrato → se refresca la evidencia al momento.
+  useEffect(() => {
+    const fn = (ev) => ev.detail?.tipo === "contrato_aceptado" && String(ev.detail?.datos?.proyecto_id) === String(id) && setVersion((v) => v + 1);
+    window.addEventListener("seventwo:notificacion", fn);
+    return () => window.removeEventListener("seventwo:notificacion", fn);
   }, [id]);
 
   if (!p) return <div className="table-panel"><div className="auth-embed"><Alerta>{error}</Alerta>{!error && <p className="admin-vacio">Cargando…</p>}</div></div>;
@@ -200,6 +209,8 @@ function ProyectoAdmin({ id, onVolver }) {
           </div>
         </>
       )}
+      <p className="eyebrow" style={{ marginTop: 28 }}>Contrato</p>
+      <ContratosAdmin proyectoId={p.id} contratos={p.contratos} almacen={p.almacen} onCambio={() => setVersion((v) => v + 1)} />
     </div>
   );
 }

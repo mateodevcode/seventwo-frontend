@@ -28,17 +28,19 @@ export function onSesion(fn) {
   return () => oyentes.delete(fn);
 }
 
-async function peticion(ruta, { method = "GET", body, token } = {}) {
+async function peticion(ruta, { method = "GET", body, token, archivo } = {}) {
   let res;
   try {
     res = await fetch(`${API_URL}${ruta}`, {
       method,
       credentials: "include",
       headers: {
-        ...(body !== undefined && { "Content-Type": "application/json" }),
+        // `archivo` (File/Blob) se envía crudo con su tipo (p. ej. application/pdf).
+        ...(archivo ? { "Content-Type": archivo.type || "application/octet-stream" }
+          : body !== undefined && { "Content-Type": "application/json" }),
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: archivo ?? (body !== undefined ? JSON.stringify(body) : undefined),
     });
   } catch {
     throw new ApiError(0, "No pudimos conectar con el servidor. Revisa tu conexión.");
@@ -73,16 +75,37 @@ export function refrescarSesion() {
  * renueva la sesión y reintenta una vez.
  * @returns {Promise<{ success: boolean, message?: string, data?: any }>}
  */
-export async function api(ruta, { method, body, auth = false } = {}) {
-  if (!auth) return peticion(ruta, { method, body });
+export async function api(ruta, { method, body, auth = false, archivo } = {}) {
+  if (!auth) return peticion(ruta, { method, body, archivo });
 
   if (!sesion?.accessToken) await refrescarSesion();
   try {
-    return await peticion(ruta, { method, body, token: sesion?.accessToken });
+    return await peticion(ruta, { method, body, archivo, token: sesion?.accessToken });
   } catch (error) {
     if (error.status !== 401) throw error;
     await refrescarSesion();
-    return peticion(ruta, { method, body, token: sesion?.accessToken });
+    return peticion(ruta, { method, body, archivo, token: sesion?.accessToken });
+  }
+}
+
+/**
+ * Abre un archivo privado: pide al backend una URL firmada (caduca en minutos)
+ * y la abre en otra pestaña. La pestaña se abre antes de la espera para que el
+ * navegador no la bloquee como ventana emergente.
+ */
+export async function abrirArchivo(ruta) {
+  const pestana = window.open("", "_blank");
+  try {
+    const r = await api(ruta, { auth: true });
+    if (pestana) {
+      pestana.opener = null;
+      pestana.location.href = r.data.url;
+    } else {
+      window.location.assign(r.data.url);
+    }
+  } catch (e) {
+    pestana?.close();
+    throw e;
   }
 }
 

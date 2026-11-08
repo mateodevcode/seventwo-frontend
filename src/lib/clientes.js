@@ -13,6 +13,17 @@ export const ESTADOS_PROYECTO = {
   finalizado: "Finalizado",
   cancelado: "Cancelado",
 };
+export const ESTADOS_CONTRATO = {
+  borrador: "Borrador",
+  enviado: "Pendiente de aceptar",
+  aceptado: "Aceptado",
+  firmado_fuera: "Firmado",
+  reemplazado: "Reemplazado",
+};
+export const fechaHoraLarga = (iso) =>
+  iso ? new Date(iso).toLocaleString("es-CO", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
+export const tamano = (bytes) => (bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
+
 export const ESTADOS_HITO = { pendiente: "Pendiente", en_curso: "En curso", completado: "Completado" };
 export const TIPOS_PROYECTO = ["Página web", "Aplicación web", "App móvil", "Software a medida", "Mantenimiento", "Otro"];
 

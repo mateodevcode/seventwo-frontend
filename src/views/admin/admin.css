@@ -1,0 +1,80 @@
+/* === AREA ADMIN — sobre los estilos de area-cliente.css (.cliente-root) === */
+
+.cliente-root .admin-summary { grid-template-columns: repeat(4, 1fr); }
+
+.cliente-root .admin-toolbar { gap: 16px; flex-wrap: wrap; }
+.cliente-root .admin-filtros { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.cliente-root .admin-buscar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 240px;
+  border: 1px solid var(--cliente-line);
+  background: var(--cliente-panel);
+  padding: 0 12px;
+  height: 38px;
+  color: var(--cliente-muted);
+}
+.cliente-root .admin-buscar:focus-within { border-color: var(--cliente-lime); }
+.cliente-root .admin-buscar svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.cliente-root .admin-buscar input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--cliente-fg);
+  font-size: 13px;
+}
+
+.cliente-root .admin-select {
+  height: 38px;
+  background: var(--cliente-panel);
+  border: 1px solid var(--cliente-line);
+  border-radius: 0;
+  color: var(--cliente-fg);
+  padding: 0 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.cliente-root .admin-select:focus { outline: none; border-color: var(--cliente-lime); }
+.cliente-root .admin-select:disabled { opacity: 0.5; cursor: wait; }
+.cliente-root .table-row .admin-select { height: 32px; }
+
+/* Filas: usuario | rol | acceso | estado | último acceso | acciones */
+.cliente-root .admin-row { grid-template-columns: 2.2fr 1.1fr 0.8fr 1.1fr 1fr 40px; }
+.cliente-root .admin-user { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.cliente-root .admin-user strong,
+.cliente-root .admin-user span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cliente-root .admin-row.is-bloqueado .admin-user strong { color: var(--cliente-muted); text-decoration: line-through; }
+
+.cliente-root .admin-estado { color: var(--cliente-lime); }
+.cliente-root .admin-estado.pendiente { color: var(--cliente-muted); }
+.cliente-root .admin-estado.bloqueado { color: #ff6b81; }
+
+.cliente-root .admin-acciones { display: flex; justify-content: flex-end; }
+.cliente-root .admin-acciones .icon-button:disabled { opacity: 0.5; cursor: wait; }
+
+.cliente-root .admin-aviso { margin-bottom: 14px; }
+.cliente-root .admin-vacio { margin: 0; padding: 24px 0; color: var(--cliente-muted); font-size: 13px; border-top: 1px solid var(--cliente-line); }
+
+.cliente-root .admin-paginacion {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  color: var(--cliente-muted);
+  font-size: 12px;
+  font-family: monospace;
+}
+
+@media (max-width: 900px) {
+  .cliente-root .admin-summary { grid-template-columns: repeat(2, 1fr); }
+  .cliente-root .admin-row { grid-template-columns: 1.8fr 1fr 40px; }
+  .cliente-root .admin-row > :nth-child(3),
+  .cliente-root .admin-row > :nth-child(4),
+  .cliente-root .admin-row > :nth-child(5) { display: none; }
+  .cliente-root .admin-buscar { min-width: 0; flex: 1; }
+}

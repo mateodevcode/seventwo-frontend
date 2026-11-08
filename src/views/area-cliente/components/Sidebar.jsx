@@ -1,28 +1,39 @@
-import { LogOut, Settings, ShieldCheck } from "lucide-react";
-import { navigation } from "@/data/data.area-cliente";
+import Link from "next/link";
+import { LayoutGrid, LogOut, Settings, ShieldCheck } from "lucide-react";
 import LogoModerno from "@/components/logo/LogoModerno";
 import { iniciales, useAuth } from "@/components/auth/AuthProvider";
+import { ETIQUETA_ROL, esEquipo } from "@/lib/roles";
 
-export default function Sidebar({ active, onNavigate }) {
+/**
+ * Barra lateral compartida por el área de cliente y el área /admin.
+ * @param items     secciones visibles (ya filtradas por rol)
+ * @param tag       etiqueta bajo el logo
+ * @param enlace    acceso a la otra área { href, label }; por defecto, admin/superadmin
+ *                  ven "Administración" en el área de cliente
+ */
+export default function Sidebar({ items = [], active, onNavigate, tag = "Client area", enlace }) {
   const { usuario, cerrarSesion } = useAuth();
 
   // Al quedar sin sesión, RequiereSesion redirige a /login.
   const salir = () => cerrarSesion().catch(() => {});
 
+  const acceso = enlace ?? (esEquipo(usuario?.rol) ? { href: "/admin", label: "Administración", icon: LayoutGrid } : null);
+  const AccesoIcono = acceso?.icon ?? LayoutGrid;
+
   return (
     <aside
       className="portal-sidebar"
-      aria-label="Navegación del área de cliente"
+      aria-label="Navegación"
     >
       <div className="brand-lockup">
         <LogoModerno href="/" />
-        <span className="client-tag">Client area</span>
+        <span className="client-tag">{tag}</span>
       </div>
 
       <div className="workspace-label">Espacio de trabajo</div>
 
       <nav className="sidebar-nav">
-        {navigation.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;
           return (
@@ -49,21 +60,28 @@ export default function Sidebar({ active, onNavigate }) {
             <span>{usuario?.otp_activo ? "Tu cuenta está protegida" : "Activa la verificación en dos pasos"}</span>
           </div>
         </div>
-        <button
-          type="button"
-          className="nav-item"
-          onClick={() => onNavigate?.("seguridad")}
-        >
-          <Settings aria-hidden="true" />
-          <span>Configuración</span>
-        </button>
+        {acceso ? (
+          <Link className="nav-item" href={acceso.href}>
+            <AccesoIcono aria-hidden="true" />
+            <span>{acceso.label}</span>
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="nav-item"
+            onClick={() => onNavigate?.("seguridad")}
+          >
+            <Settings aria-hidden="true" />
+            <span>Configuración</span>
+          </button>
+        )}
         <div className="user-mini">
           <div className="avatar" aria-hidden="true">
             {iniciales(usuario?.name)}
           </div>
           <div>
             <strong>{usuario?.name}</strong>
-            <span>{usuario?.email}</span>
+            <span>{ETIQUETA_ROL[usuario?.rol] ?? ""} · {usuario?.email}</span>
           </div>
           <button
             type="button"

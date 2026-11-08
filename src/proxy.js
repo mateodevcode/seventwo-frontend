@@ -13,5 +13,5 @@ export function proxy(request) {
 }
 
 export const config = {
-  matcher: ["/area-cliente", "/area-cliente/:path*"],
+  matcher: ["/area-cliente", "/area-cliente/:path*", "/admin", "/admin/:path*"],
 };

@@ -7,6 +7,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import PageHeading from "./components/PageHeading";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 function QuickCard({ icon: Icon, label, value, note, onClick }) {
   return (
@@ -24,14 +25,22 @@ function QuickCard({ icon: Icon, label, value, note, onClick }) {
   );
 }
 
+const saludo = (h) => (h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches");
+const fechaHoy = () => {
+  const f = new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  return f.charAt(0).toUpperCase() + f.slice(1);
+};
+
 export default function Overview({ onNavigate }) {
+  const { usuario } = useAuth();
+  const nombre = usuario?.name?.split(" ")[0] ?? "";
   return (
     <section id="resumen" aria-label="Resumen">
       <PageHeading
-        eyebrow="Lunes, 1 de julio de 2024"
+        eyebrow={fechaHoy()}
         title={
           <>
-            Buenos días, <em>María</em>
+            {saludo(new Date().getHours())}, <em>{nombre}</em>
           </>
         }
         description="Aquí tienes una vista general de tu cuenta y tus proyectos."

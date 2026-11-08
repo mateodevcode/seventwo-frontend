@@ -1,12 +1,12 @@
 import { Bell, ChevronDown, Search } from "lucide-react";
 import { iniciales, useAuth } from "@/components/auth/AuthProvider";
 
-export default function Topbar({ title }) {
+export default function Topbar({ title, seccion = "Área de cliente" }) {
   const { usuario } = useAuth();
   return (
     <header className="topbar">
       <div className="breadcrumbs">
-        <span>Área de cliente</span>
+        <span>{seccion}</span>
         <span>/</span>
         <strong>{title}</strong>
       </div>

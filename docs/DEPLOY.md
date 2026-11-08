@@ -173,6 +173,18 @@ Estado:
 cd /srv/infra/seventwo/seventwo-backend && docker compose ps
 ```
 
+Roles (`usuario` < `cliente` < `admin` < `superadmin`). Desde `/admin`, un admin pasa usuarios a clientes y un superadmin nombra admins. **Superadmin solo se asigna desde el VPS:**
+
+```bash
+docker exec seventwo-backend node src/scripts/rol.js correo@ejemplo.com superadmin
+```
+
+Sin rol, muestra el actual:
+
+```bash
+docker exec seventwo-backend node src/scripts/rol.js correo@ejemplo.com
+```
+
 Backup de la base:
 
 ```bash

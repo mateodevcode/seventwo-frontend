@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AlertTriangle, CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
 import LogoModerno from "@/components/logo/LogoModerno";
 import { urlGoogle } from "@/lib/api";
+import { scrollbarStyles } from "@/data/data.styles.scrollbar";
 import "./auth.css";
 
 export function AuthShell({ eyebrow, titulo, subtitulo, children, pie }) {
@@ -24,6 +25,8 @@ export function AuthShell({ eyebrow, titulo, subtitulo, children, pie }) {
         </section>
         {pie && <div className="auth-foot">{pie}</div>}
       </div>
+      {/* Misma scrollbar que la home y el área de cliente (lima sobre #100b17) */}
+      <style>{scrollbarStyles.home}</style>
     </main>
   );
 }

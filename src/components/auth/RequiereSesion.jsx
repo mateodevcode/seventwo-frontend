@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "./AuthProvider";
+import { scrollbarStyles } from "@/data/data.styles.scrollbar";
 import "./auth.css";
 
 export default function RequiereSesion({ children }) {
@@ -24,6 +25,7 @@ export default function RequiereSesion({ children }) {
           <Loader2 className="auth-spin" aria-hidden="true" />
           <span>Cargando tu área de cliente…</span>
         </div>
+        <style>{scrollbarStyles.home}</style>
       </main>
     );
   }

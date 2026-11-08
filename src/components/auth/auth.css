@@ -1,5 +1,5 @@
 /* === AUTH SEVENTWO — mismo lenguaje que el área de cliente (.cliente-root) === */
-/* Fondo oscuro, lima, violeta, bordes cuadrados, Impact/Anton + monospace */
+/* Fondo oscuro, lima, verde azulado, bordes cuadrados, Impact/Anton + monospace */
 
 /* Variables también disponibles embebidas (.auth-embed) en el área de cliente */
 .auth-root,
@@ -9,8 +9,9 @@
   --auth-muted: #aa9fb1;
   --auth-line: #382d3f;
   --auth-lime: #ffff00;
-  --auth-violet: #6311a6;
   --auth-teal: #00423f;
+  /* Sombra desplazada de la tarjeta: verde azulado de marca (tercero) */
+  --auth-accent: #00a49c;
   --auth-card: #191220;
   --auth-panel: #171020;
   --auth-error: #ff6b81;
@@ -23,8 +24,8 @@
   min-height: 100vh;
   min-height: 100dvh;
   background:
-    radial-gradient(60rem 30rem at 85% -10%, rgba(99, 17, 166, 0.28), transparent 60%),
-    radial-gradient(40rem 24rem at -10% 110%, rgba(0, 66, 63, 0.35), transparent 60%),
+    radial-gradient(60rem 30rem at 85% -10%, rgba(0, 164, 156, 0.16), transparent 60%),
+    radial-gradient(40rem 24rem at -10% 110%, rgba(255, 255, 0, 0.06), transparent 60%),
     var(--auth-bg);
   color: var(--auth-fg);
   font-family: Arial, sans-serif;
@@ -50,14 +51,14 @@
 .auth-card {
   background: var(--auth-card);
   border: 1px solid var(--auth-line);
-  box-shadow: 8px 8px 0 var(--auth-violet);
+  box-shadow: 8px 8px 0 var(--auth-accent);
   padding: 32px 28px;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 @media (max-width: 480px) {
-  .auth-card { padding: 26px 18px; box-shadow: 5px 5px 0 var(--auth-violet); }
+  .auth-card { padding: 26px 18px; box-shadow: 5px 5px 0 var(--auth-accent); }
 }
 
 .auth-eyebrow {

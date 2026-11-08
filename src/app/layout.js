@@ -72,11 +72,11 @@ export const metadata = {
     icon: "/logo/favicon.ico",
     shortcut: "/logo/favicon.ico",
   },
-  metadataBase: new URL("https://www.seventwo.tech"),
+  metadataBase: new URL("https://seventwo.tech"),
   openGraph: {
     title: "Seventwo Technologies",
     description: "Desarrollamos el software que tu empresa necesita.",
-    url: "https://www.seventwo.tech",
+    url: "https://seventwo.tech",
     siteName: "Seventwo",
     images: [
       {
@@ -93,7 +93,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Seventwo Technologies",
     description: "Desarrollo de software y soluciones tecnológicas avanzadas.",
-    images: ["https://www.seventwo.tech/og-image.png"],
+    images: ["https://seventwo.tech/og-image.png"],
     creator: "@seventwotech", // opcional
   },
 };

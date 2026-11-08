@@ -1,0 +1,115 @@
+# .github/workflows/deploy.yml — Web Next.js → VPS /srv/infra/seventwo/seventwo-frontend
+# Mismo patrón que web-inmobitwo. Secrets del repo: VPS_HOST, VPS_USER, VPS_SSH_KEY.
+# Lo único manual en el VPS es .env.production (ver docs/DEPLOY.md).
+name: Deploy Web Seventwo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-seventwo-web
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: SSH Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        env:
+          # Token efímero del job: permite clonar/actualizar aunque el repo sea
+          # privado. Va como cabecera por comando (-c http.extraheader), así no
+          # queda escrito en .git/config, FETCH_HEAD ni el reflog del VPS.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}.git
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: GH_TOKEN,REPO_URL
+          command_timeout: 40m
+          script: |
+            set -e
+
+            APP_DIR=/srv/infra/seventwo/seventwo-frontend
+            DOMINIO=seventwo.tech
+
+            AUTH="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+            git_auth() { git -c "http.https://github.com/.extraheader=$AUTH" "$@"; }
+
+            echo "🚀 Despliegue Web (Next.js) → $DOMINIO"
+
+            # 0. Asegurar repo en $APP_DIR
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "→ Clonando repo por primera vez..."
+              mkdir -p "$(dirname "$APP_DIR")"
+              git_auth clone "$REPO_URL" "$APP_DIR"
+            fi
+            cd "$APP_DIR"
+
+            echo "→ Preservando .env.production..."
+            cp .env.production /tmp/seventwo-web.env.bak 2>/dev/null || true
+
+            echo "→ Actualizando código..."
+            git_auth fetch origin main
+            git reset --hard origin/main
+            git clean -fd -e .env.production
+
+            cp /tmp/seventwo-web.env.bak .env.production 2>/dev/null || true
+            rm -f /tmp/seventwo-web.env.bak
+
+            if [ ! -f .env.production ]; then
+              echo "❌ Falta .env.production — créalo desde .env.example en $APP_DIR y vuelve a deployar"
+              exit 1
+            fi
+
+            echo "→ Build y levantada (NEXT_PUBLIC_* se hornean desde .env.production)..."
+            set -a; . ./.env.production; set +a
+            [ -n "$NEXT_PUBLIC_API_URL" ] || { echo "❌ NEXT_PUBLIC_API_URL vacío en .env.production"; exit 1; }
+            docker network inspect central_network >/dev/null
+            docker compose up -d --build --remove-orphans
+
+            echo "→ SSL (certbot, un certificado para $DOMINIO y www.$DOMINIO, con reintentos)..."
+            if [ ! -f /etc/letsencrypt/live/$DOMINIO/fullchain.pem ]; then
+              echo "→ Certificado no existe — generándolo con plugin nginx (cero downtime)..."
+              OK=0
+              for i in 1 2 3; do
+                if sudo certbot certonly --nginx -d $DOMINIO -d www.$DOMINIO --cert-name $DOMINIO --non-interactive --agree-tos -m admin@seventwo.tech; then
+                  OK=1
+                  break
+                fi
+                echo "⚠️ intento $i falló (otro certbot en curso o DNS sin propagar?) — reintentando en 20s..."
+                sleep 20
+              done
+              [ "$OK" = "1" ] || { echo "❌ certbot falló 3 veces (¿los registros A de $DOMINIO y www.$DOMINIO apuntan al VPS?)"; exit 1; }
+            else
+              echo "→ Certificado ya existe — renovando si es necesario (tolerante: el timer de certbot lo cubre)..."
+              sudo certbot renew --quiet || echo "⚠️ renew omitido (lock ocupado o nada que renovar)"
+            fi
+
+            echo "→ Nginx ($DOMINIO → 127.0.0.1:4001)..."
+            sudo cp nginx/seventwo.conf /etc/nginx/sites-available/seventwo
+            sudo ln -sf ../sites-available/seventwo /etc/nginx/sites-enabled/seventwo
+            sudo nginx -t && sudo systemctl reload nginx
+
+            echo "→ Limpieza imágenes viejas..."
+            docker image prune -f
+
+            echo "→ Estado..."
+            docker compose ps
+            i=1
+            until curl -sf -o /dev/null "https://$DOMINIO/"; do
+              if [ $i -ge 12 ]; then
+                echo "❌ La web no responde tras 12 intentos. Logs:"
+                docker logs --tail 60 seventwo-web || true
+                exit 1
+              fi
+              echo "… esperando la web (intento $i/12)"
+              sleep 5
+              i=$((i + 1))
+            done
+            curl -s -o /dev/null -w "→ /area-cliente sin sesión: %{http_code} → %{redirect_url}\n" "https://$DOMINIO/area-cliente"
+            echo "✅ Deploy Web OK"

@@ -1,0 +1,21 @@
+# seventwo-frontend en VPS: /srv/infra/seventwo/seventwo-frontend
+# Las NEXT_PUBLIC_* se hornean en build: el workflow las exporta desde
+# .env.production (manual, gitignored) antes del up.
+# Puerto en el host 4001 (3000 y 3001 los usa inmobitwo); nginx/seventwo.conf
+# hace de proxy TLS para seventwo.tech.
+services:
+  web:
+    build:
+      context: .
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    container_name: seventwo-web
+    ports:
+      - "127.0.0.1:4001:3000"
+    restart: unless-stopped
+    networks:
+      - central_network
+
+networks:
+  central_network:
+    external: true

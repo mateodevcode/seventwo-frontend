@@ -6,12 +6,14 @@ inmobitwo (`backend-inmobitwo`), con las correcciones de seguridad indicadas en 
 ## 1. Arquitectura
 
 ```
-Navegador ──► new.seventwo.tech  (Next 16 en Cloudflare Workers, solo UI)
+Navegador ──► seventwo.tech  (Next 16 standalone en Docker, VPS, detrás de nginx)
     │
-    └──fetch (credentials: include)──► api.seventwo.tech  (Express en VPS, Docker)
-                                            ├── PostgreSQL (Docker, red interna, no expuesto)
+    └──fetch (credentials: include)──► api.seventwo.tech  (Express en Docker, mismo VPS)
+                                            ├── postgres_central (red central_network, no expuesto)
                                             └── Nodemailer ──SMTP──► smtp-relay.brevo.com:587
 ```
+
+El despliegue se describe en [DEPLOY.md](DEPLOY.md).
 
 - **seventwo-backend** (repo nuevo): Express 5 + `pg` + `bcryptjs` + `jsonwebtoken` + `nodemailer`.
 - **Sin Redis.** Rate limit y códigos de un solo uso se guardan en Postgres (§3).
@@ -223,7 +225,7 @@ Rutas nuevas en `src/app/`:
 
 - `src/lib/api.js`: `fetch` con `credentials: "include"`, añade el bearer y hace refresh automático ante un 401.
 - `AuthProvider` (contexto): guarda `usuario` y `accessToken` en memoria y hace refresh al montar.
-- La protección de `/area-cliente/*` se hace en el `proxy` de Next 16 (antes `middleware`; confirmar en `node_modules/next/dist/docs`). Si no hay cookie `refresh_token`, redirige a `/login?next=...`. La validación real la hace el backend.
+- La protección de `/area-cliente/*` se hace en `src/proxy.js`, el `proxy` de Next 16 (antes `middleware`). Si no hay cookie `refresh_token`, redirige a `/login?next=...`. La validación real la hace el backend.
 - Variable de entorno: `NEXT_PUBLIC_API_URL=https://api.seventwo.tech`.
 
 ## 10. Variables de entorno (backend)

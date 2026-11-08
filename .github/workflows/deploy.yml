@@ -75,6 +75,15 @@ jobs:
 
             echo "→ SSL (certbot, un certificado para $DOMINIO y www.$DOMINIO, con reintentos)..."
             if [ ! -f /etc/letsencrypt/live/$DOMINIO/fullchain.pem ]; then
+              # Let's Encrypt rechaza el certificado entero si un nombre no llega a este VPS.
+              IP_VPS=$(curl -s4 --max-time 10 https://api.ipify.org || hostname -I | awk '{print $1}')
+              for d in $DOMINIO www.$DOMINIO; do
+                IP_DNS=$(getent ahostsv4 "$d" | awk '{print $1}' | sort -u | tr '\n' ' ')
+                case " $IP_DNS " in
+                  *" $IP_VPS "*) echo "  ✔ $d → $IP_VPS" ;;
+                  *) echo "❌ $d resuelve a [${IP_DNS:-nada}] y no a este VPS ($IP_VPS). Corrige su registro A/CNAME y vuelve a deployar."; exit 1 ;;
+                esac
+              done
               echo "→ Certificado no existe — generándolo con plugin nginx (cero downtime)..."
               OK=0
               for i in 1 2 3; do

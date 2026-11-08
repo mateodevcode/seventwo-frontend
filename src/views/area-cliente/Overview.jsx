@@ -1,13 +1,14 @@
-import {
-  ArrowUpRight,
-  Check,
-  FileText,
-  Headphones,
-  Plus,
-  Sparkles,
-} from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { ArrowUpRight, Check, FilePlus2, FileText, FolderKanban, Plus, Sparkles, UserRound } from "lucide-react";
 import PageHeading from "./components/PageHeading";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { api } from "@/lib/api";
+import { fecha } from "@/lib/clientes";
+import { haceCuanto } from "@/lib/solicitudes";
+import { PillProyecto, Progreso } from "@/components/clientes/Proyecto";
+import "@/components/clientes/clientes.css";
 
 function QuickCard({ icon: Icon, label, value, note, onClick }) {
   return (
@@ -27,22 +28,36 @@ function QuickCard({ icon: Icon, label, value, note, onClick }) {
 
 const saludo = (h) => (h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches");
 const fechaHoy = () => {
-  const f = new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const f = new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   return f.charAt(0).toUpperCase() + f.slice(1);
 };
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
-export default function Overview({ onNavigate }) {
+export default function Overview({ onNavigate, onAbrirProyecto }) {
   const { usuario } = useAuth();
   const nombre = usuario?.name?.split(" ")[0] ?? "";
+  const [r, setR] = useState(null);
+  const [version, setVersion] = useState(0);
+
+  useEffect(() => {
+    let vigente = true;
+    api("/clientes/yo/resumen", { auth: true }).then((x) => vigente && setR(x.data)).catch(() => {});
+    return () => { vigente = false; };
+  }, [version]);
+  useEffect(() => {
+    const fn = (ev) => /^(proyecto_|solicitud_)/.test(ev.detail?.tipo ?? "") && setVersion((v) => v + 1);
+    window.addEventListener("seventwo:notificacion", fn);
+    return () => window.removeEventListener("seventwo:notificacion", fn);
+  }, []);
+
+  const principal = r?.proyectos?.[0];
+  const otros = (r?.proyectos?.length ?? 0) - 1;
+
   return (
     <section id="resumen" aria-label="Resumen">
       <PageHeading
         eyebrow={fechaHoy()}
-        title={
-          <>
-            {saludo(new Date().getHours())}, <em>{nombre}</em>
-          </>
-        }
+        title={<>{saludo(new Date().getHours())}, <em>{nombre}</em></>}
         description="Aquí tienes una vista general de tu cuenta y tus proyectos."
         action={
           <button type="button" className="button button-primary" onClick={() => onNavigate("cotizar")}>
@@ -53,18 +68,38 @@ export default function Overview({ onNavigate }) {
 
       <div className="overview-grid">
         <div className="welcome-card">
-          <div>
-            <span className="card-kicker">Proyecto activo</span>
-            <h2>
-              Tu presencia digital,
-              <br />
-              <em>en buenas manos.</em>
-            </h2>
-            <p>Estamos cuidando cada detalle para que tu negocio siga creciendo.</p>
-            <button type="button" className="text-button" onClick={() => onNavigate("servicio")}>
-              Ver servicio <ArrowUpRight aria-hidden="true" />
-            </button>
-          </div>
+          {principal ? (
+            <div style={{ width: "100%" }}>
+              <span className="card-kicker">{principal.codigo} · Proyecto activo</span>
+              <h2>{principal.nombre}</h2>
+              <div style={{ display: "flex", gap: 12, alignItems: "center", margin: "6px 0 14px", maxWidth: 360 }}>
+                <PillProyecto estado={principal.estado} />
+                <div style={{ flex: 1 }}><Progreso valor={principal.progreso} /></div>
+              </div>
+              <p>
+                {principal.siguiente_hito
+                  ? <>Próximo hito: <strong>{principal.siguiente_hito}</strong>{principal.siguiente_hito_fecha ? ` · ${fecha(principal.siguiente_hito_fecha)}` : ""}</>
+                  : principal.fecha_entrega_estimada ? <>Entrega prevista: <strong>{fecha(principal.fecha_entrega_estimada)}</strong></> : "Estamos trabajando en tu proyecto."}
+              </p>
+              <button type="button" className="text-button" onClick={() => onAbrirProyecto(principal.codigo)}>
+                Ver proyecto <ArrowUpRight aria-hidden="true" />
+              </button>
+              {otros > 0 && (
+                <button type="button" className="text-button" style={{ marginLeft: 18 }} onClick={() => onNavigate("proyectos")}>
+                  y {plural(otros, "proyecto más", "proyectos más")} <ArrowUpRight aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <div>
+              <span className="card-kicker">{r?.cliente ? "Bienvenido a Seventwo" : "Tu cuenta"}</span>
+              <h2>Tu presencia digital,<br /><em>en buenas manos.</em></h2>
+              <p>{r?.cliente ? "Estamos preparando tu proyecto. Lo verás aquí en cuanto esté dado de alta." : "Cuéntanos qué necesitas y prepararemos una propuesta para ti."}</p>
+              <button type="button" className="text-button" onClick={() => onNavigate(r?.cliente ? "proyectos" : "cotizar")}>
+                {r?.cliente ? "Mis proyectos" : "Solicitar presupuesto"} <ArrowUpRight aria-hidden="true" />
+              </button>
+            </div>
+          )}
           <div className="orbital-art" aria-hidden="true">
             <div className="orbital-line one" />
             <div className="orbital-line two" />
@@ -78,15 +113,11 @@ export default function Overview({ onNavigate }) {
             <span className="status-dot">Al día</span>
           </div>
           <div className="stat-main">
-            <strong>480,00 €</strong>
-            <span>próximo pago · 28 Jul 2024</span>
+            <strong style={{ fontSize: 22 }}>Sin cobros pendientes</strong>
+            <span>Tus cuentas de cobro y pagos aparecerán aquí muy pronto.</span>
           </div>
-          <div className="stat-progress">
-            <div />
-            <span>100% pagado</span>
-          </div>
-          <button type="button" className="button button-outline" onClick={() => onNavigate("pagos")}>
-            Ver pagos <ArrowUpRight aria-hidden="true" />
+          <button type="button" className="button button-outline" onClick={() => onNavigate("datos")}>
+            Datos de facturación <ArrowUpRight aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -100,25 +131,25 @@ export default function Overview({ onNavigate }) {
 
       <div className="quick-grid">
         <QuickCard
-          icon={FileText}
-          label="Facturas"
-          value="2 pendientes"
-          note="Última factura · 480,00 €"
-          onClick={() => onNavigate("facturas")}
+          icon={FolderKanban}
+          label="Mis proyectos"
+          value={r ? plural(r.conteos.proyectos_activos, "activo", "activos") : "…"}
+          note={r?.conteos.proyectos ? `${plural(r.conteos.proyectos, "proyecto", "proyectos")} en total` : "Aún no hay proyectos"}
+          onClick={() => onNavigate("proyectos")}
         />
         <QuickCard
-          icon={Sparkles}
-          label="Servicio contratado"
-          value="Mantenimiento web"
-          note="Activo desde Ene 2024"
-          onClick={() => onNavigate("servicio")}
+          icon={FilePlus2}
+          label="Solicitudes"
+          value={r ? plural(r.conteos.solicitudes_abiertas, "abierta", "abiertas") : "…"}
+          note="Presupuestos en conversación"
+          onClick={() => onNavigate("cotizar")}
         />
         <QuickCard
-          icon={Headphones}
-          label="Soporte"
-          value="1 ticket abierto"
-          note="Última respuesta · hace 2h"
-          onClick={() => onNavigate("soporte")}
+          icon={UserRound}
+          label="Perfil"
+          value="Datos de facturación"
+          note="Mantén tus datos al día"
+          onClick={() => onNavigate("datos")}
         />
       </div>
 
@@ -129,30 +160,23 @@ export default function Overview({ onNavigate }) {
               <p className="eyebrow">Actividad reciente</p>
               <h2>Últimos movimientos</h2>
             </div>
-            <button type="button" className="quiet-button" onClick={() => onNavigate("facturas")}>
-              Ver todo <ArrowUpRight aria-hidden="true" />
-            </button>
           </div>
-          <div className="activity-item">
-            <div className="activity-icon paid">
-              <Check aria-hidden="true" />
-            </div>
-            <div>
-              <strong>Pago recibido</strong>
-              <span>Factura FAC-2024-008 · 28 Jun 2024</span>
-            </div>
-            <b>+480,00 €</b>
-          </div>
-          <div className="activity-item">
-            <div className="activity-icon message">
-              <Headphones aria-hidden="true" />
-            </div>
-            <div>
-              <strong>Respuesta de soporte</strong>
-              <span>Ticket #2841 · 27 Jun 2024</span>
-            </div>
-            <b>Hace 2 días</b>
-          </div>
+          {r?.actividad?.length ? (
+            r.actividad.map((a) => (
+              <div className="activity-item" key={a.id}>
+                <div className={`activity-icon ${a.entidad === "proyecto" ? "paid" : "message"}`}>
+                  {a.entidad === "proyecto" ? <Check aria-hidden="true" /> : <FileText aria-hidden="true" />}
+                </div>
+                <div>
+                  <strong>{a.descripcion}</strong>
+                  <span>{new Date(a.created_at).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric" })}</span>
+                </div>
+                <b>{haceCuanto(a.created_at)}</b>
+              </div>
+            ))
+          ) : (
+            <p className="admin-vacio">Todavía no hay movimientos.</p>
+          )}
         </div>
 
         <div className="quote-card">

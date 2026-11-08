@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Alerta, Boton, Campo } from "@/components/auth/ui";
 import { ETIQUETA_ROL } from "@/lib/roles";
+import DatosFacturacion from "./DatosFacturacion";
 
 function Info({ label, value }) {
   return (
@@ -21,7 +22,7 @@ function Info({ label, value }) {
 
 const DESCRIPCION_ROL = {
   usuario: "Puedes solicitar presupuestos y gestionar tu perfil.",
-  cliente: "Tienes acceso a tus servicios, facturas, pagos y soporte.",
+  cliente: "Tienes acceso a tus proyectos, cuentas de cobro, pagos y soporte.",
   admin: "Formas parte del equipo de Seventwo.",
   superadmin: "Acceso completo, incluida la gestión de roles.",
 };
@@ -146,6 +147,7 @@ export default function Perfil() {
           </p>
         </div>
       </div>
+      <DatosFacturacion />
     </section>
   );
 }

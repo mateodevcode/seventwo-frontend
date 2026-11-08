@@ -1,14 +1,18 @@
 "use client";
 
 // Área /admin (admin y superadmin). Reutiliza el shell y estilos del área de cliente.
-// La URL manda: /admin?seccion=solicitudes&solicitud=12 (enlaces de emails y notificaciones).
+// La URL manda (enlaces de emails y notificaciones):
+//   /admin?seccion=solicitudes&solicitud=12
+//   /admin?seccion=clientes&cliente=3&proyecto=7
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Inbox, UserRound, Users } from "lucide-react";
+import { Building2, Inbox, Layers, UserRound, Users } from "lucide-react";
 import Sidebar from "@/views/area-cliente/components/Sidebar";
 import Topbar from "@/views/area-cliente/components/Topbar";
 import AdminUsuarios from "./AdminUsuarios";
 import AdminSolicitudes from "./AdminSolicitudes";
+import AdminClientes from "./AdminClientes";
+import AdminCatalogo from "./AdminCatalogo";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { api } from "@/lib/api";
 import { ETIQUETA_ROL } from "@/lib/roles";
@@ -25,12 +29,15 @@ export default function AdminPage() {
   const [nuevas, setNuevas] = useState(0);
 
   const solicitudId = params.get("solicitud");
-  const active = params.get("seccion") ?? (solicitudId ? "solicitudes" : "solicitudes");
+  const clienteId = params.get("cliente");
+  const proyectoId = params.get("proyecto");
+  const active = params.get("seccion") ?? (clienteId || proyectoId ? "clientes" : "solicitudes");
 
+  // ir("clientes", { cliente: 3, proyecto: 7 })
   const ir = useCallback(
-    (seccion, solicitud) => {
+    (seccion, extra = {}) => {
       const qs = new URLSearchParams({ seccion });
-      if (solicitud) qs.set("solicitud", String(solicitud));
+      for (const [k, v] of Object.entries(extra)) if (v) qs.set(k, String(v));
       router.push(`${pathname}?${qs}`, { scroll: false });
     },
     [router, pathname],
@@ -53,6 +60,8 @@ export default function AdminPage() {
 
   const secciones = [
     { id: "solicitudes", label: "Solicitudes", icon: Inbox, badge: nuevas ? String(nuevas) : null },
+    { id: "clientes", label: "Clientes", icon: Building2 },
+    { id: "catalogo", label: "Catálogo", icon: Layers },
     { id: "usuarios", label: "Usuarios y roles", icon: Users },
   ];
   const current = secciones.find((s) => s.id === active) ?? secciones[0];
@@ -74,9 +83,19 @@ export default function AdminPage() {
               <AdminSolicitudes
                 key={solicitudId ?? "lista"}
                 idInicial={solicitudId}
-                onCambiarId={(id) => ir("solicitudes", id)}
+                onCambiarId={(id) => ir("solicitudes", { solicitud: id })}
+                onAbrirProyecto={(cliente, proyecto) => ir("clientes", { cliente, proyecto })}
               />
             )}
+            {current.id === "clientes" && (
+              <AdminClientes
+                clienteId={clienteId}
+                proyectoId={proyectoId}
+                onIr={(extra) => ir("clientes", extra)}
+                onAbrirSolicitud={(id) => ir("solicitudes", { solicitud: id })}
+              />
+            )}
+            {current.id === "catalogo" && <AdminCatalogo />}
             {current.id === "usuarios" && <AdminUsuarios />}
           </div>
         </section>

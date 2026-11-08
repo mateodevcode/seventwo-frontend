@@ -1,0 +1,118 @@
+/* === Clientes y proyectos (área de cliente y /admin) — sobre .cliente-root === */
+
+/* Formulario de ficha */
+.cliente-root .ficha-form { display: flex; flex-direction: column; gap: 14px; margin-top: 22px; }
+.cliente-root .ficha-tipo { display: flex; gap: 20px; font-size: 13px; color: var(--cliente-fg); }
+.cliente-root .ficha-tipo label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.cliente-root .ficha-tipo input { accent-color: var(--cliente-lime); }
+.cliente-root .ficha-doc { display: grid; grid-template-columns: 1fr 70px; gap: 10px; align-items: start; }
+.cliente-root .ficha-doc > .auth-field:only-child { grid-column: 1 / -1; }
+.cliente-root .ficha-sub { margin: 10px 0 0; }
+
+/* Estado de proyecto */
+.cliente-root .pill.proy-en_curso,
+.cliente-root .pill.proy-mantenimiento { background: var(--cliente-lime); border-color: var(--cliente-lime); color: #100b17; }
+.cliente-root .pill.proy-entregado { background: #00a49c; border-color: #00a49c; color: #100b17; }
+.cliente-root .pill.proy-pausado,
+.cliente-root .pill.proy-propuesta { background: transparent; border: 1px solid var(--cliente-lime); color: var(--cliente-lime); }
+.cliente-root .pill.proy-finalizado,
+.cliente-root .pill.proy-cancelado,
+.cliente-root .pill.cli-baja,
+.cliente-root .pill.cli-pausado { background: transparent; border: 1px solid var(--cliente-line); color: var(--cliente-muted); }
+.cliente-root .pill.cli-activo { background: transparent; border: 1px solid #00a49c; color: #00a49c; }
+
+/* Barra de progreso */
+.cliente-root .progreso { display: flex; align-items: center; gap: 10px; }
+.cliente-root .progreso-barra { flex: 1; height: 6px; background: var(--cliente-line); min-width: 60px; }
+.cliente-root .progreso-barra div { height: 100%; background: var(--cliente-lime); }
+.cliente-root .progreso span { font: 11px monospace; color: var(--cliente-muted); min-width: 34px; text-align: right; }
+
+/* Tarjetas de proyecto (Mis proyectos) */
+.cliente-root .proyectos-lista { display: grid; gap: 14px; }
+.cliente-root .proyecto-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: 1px solid var(--cliente-line);
+  background: var(--cliente-card);
+  padding: 20px 22px;
+}
+.cliente-root .proyecto-card:hover { border-color: var(--cliente-lime); box-shadow: 4px 4px 0 var(--cliente-lime); }
+.cliente-root .proyecto-card h3 { margin: 6px 0 4px; font-size: 18px; color: var(--cliente-fg); }
+.cliente-root .proyecto-card p { margin: 0; color: var(--cliente-muted); font-size: 12px; }
+.cliente-root .proyecto-codigo { font: 11px monospace; letter-spacing: 0.06em; color: var(--cliente-muted); }
+
+/* Detalle de proyecto */
+.cliente-root .proyecto-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0; }
+.cliente-root .proyecto-meta > div { border: 1px solid var(--cliente-line); background: var(--cliente-panel); padding: 14px 16px; }
+.cliente-root .proyecto-meta span { display: block; color: var(--cliente-muted); font: 10px monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+.cliente-root .proyecto-meta strong { display: block; margin-top: 6px; font-size: 14px; color: var(--cliente-fg); }
+.cliente-root .proyecto-cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
+.cliente-root .proyecto-descripcion { white-space: pre-wrap; color: #d3c9e2; font-size: 13px; line-height: 1.6; margin: 14px 0 0; }
+
+.cliente-root .hitos { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; }
+.cliente-root .hito { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; padding: 12px 0; border-top: 1px solid var(--cliente-line); align-items: start; }
+.cliente-root .hito-marca { width: 18px; height: 18px; border: 1px solid var(--cliente-muted); display: grid; place-items: center; margin-top: 1px; }
+.cliente-root .hito-marca svg { width: 12px; height: 12px; }
+.cliente-root .hito.completado .hito-marca { background: var(--cliente-lime); border-color: var(--cliente-lime); color: #100b17; }
+.cliente-root .hito.en_curso .hito-marca { border-color: var(--cliente-lime); box-shadow: inset 0 0 0 4px var(--cliente-panel); background: var(--cliente-lime); }
+.cliente-root .hito strong { display: block; font-size: 13px; color: var(--cliente-fg); }
+.cliente-root .hito small { display: block; color: var(--cliente-muted); font-size: 11px; margin-top: 3px; }
+.cliente-root .hito-lado { text-align: right; font: 11px monospace; color: var(--cliente-muted); white-space: nowrap; }
+
+.cliente-root .vacio-card { border: 1px dashed var(--cliente-line); padding: 28px; color: var(--cliente-muted); font-size: 13px; line-height: 1.6; }
+.cliente-root .vacio-card strong { display: block; color: var(--cliente-fg); font-size: 16px; margin-bottom: 6px; }
+
+/* Pestañas (/admin → ficha de cliente) */
+.cliente-root .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--cliente-line); margin: 18px 0; overflow-x: auto; }
+.cliente-root .tabs button {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--cliente-muted);
+  padding: 10px 14px;
+  cursor: pointer;
+  font: 12px monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.cliente-root .tabs button.activo { color: var(--cliente-lime); border-bottom-color: var(--cliente-lime); }
+
+/* Filas de tablas admin */
+.cliente-root .admin-cli-row { grid-template-columns: 2fr 1.2fr 1fr 0.9fr 0.9fr; }
+.cliente-root .admin-proy-row { grid-template-columns: 0.7fr 2fr 1fr 1.1fr 1fr; }
+.cliente-root .admin-serv-row { grid-template-columns: 2fr 1fr 1fr 1fr 0.7fr; }
+
+/* Editor de hitos */
+.cliente-root .hitos-editor { display: flex; flex-direction: column; gap: 10px; }
+.cliente-root .hito-edit { display: grid; grid-template-columns: 1.8fr 1fr 0.8fr 1fr 32px; gap: 8px; align-items: end; }
+.cliente-root .hito-edit .auth-field { margin: 0; }
+.cliente-root .incluye-editor { display: flex; flex-direction: column; gap: 8px; }
+.cliente-root .incluye-fila { display: grid; grid-template-columns: 1fr 32px; gap: 8px; }
+
+.cliente-root .actividad-lista { list-style: none; margin: 0; padding: 0; }
+.cliente-root .actividad-lista li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 14px; padding: 10px 0; border-top: 1px solid var(--cliente-line); font-size: 13px; }
+.cliente-root .actividad-lista time { font: 11px monospace; color: var(--cliente-muted); }
+.cliente-root .actividad-lista em { font-style: normal; color: var(--cliente-muted); font-size: 11px; margin-left: 6px; }
+
+@media (max-width: 1000px) {
+  .cliente-root .proyecto-meta { grid-template-columns: repeat(2, 1fr); }
+  .cliente-root .proyecto-cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .cliente-root .proyecto-card { grid-template-columns: 1fr; }
+  .cliente-root .hito-edit { grid-template-columns: 1fr 1fr; }
+  .cliente-root .admin-cli-row { grid-template-columns: 1.6fr 1fr; }
+  .cliente-root .admin-cli-row > :nth-child(n + 3) { display: none; }
+  .cliente-root .admin-proy-row { grid-template-columns: 0.8fr 1.6fr 1fr; }
+  .cliente-root .admin-proy-row > :nth-child(3),
+  .cliente-root .admin-proy-row > :nth-child(5) { display: none; }
+  .cliente-root .actividad-lista li { grid-template-columns: 1fr; gap: 4px; }
+}

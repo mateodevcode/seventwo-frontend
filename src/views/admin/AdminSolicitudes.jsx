@@ -3,7 +3,8 @@
 // Admin → Solicitudes: listado con conteos por estado, detalle, conversación,
 // responder / nota interna, estado, asignado y "Pasar a cliente" (docs/PRESUPUESTOS.md §7.4).
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, Search, Send, UserCheck } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, FolderPlus, Search, Send, UserCheck } from "lucide-react";
+import ConvertirProyecto from "./ConvertirProyecto";
 import PageHeading from "@/views/area-cliente/components/PageHeading";
 import { api } from "@/lib/api";
 import { ESTADOS, fechaCorta, haceCuanto } from "@/lib/solicitudes";
@@ -115,8 +116,9 @@ function Lista({ onAbrir }) {
   );
 }
 
-function Detalle({ id, onVolver }) {
+function Detalle({ id, onVolver, onAbrirProyecto }) {
   const [s, setS] = useState(null);
+  const [convirtiendo, setConvirtiendo] = useState(false);
   const [error, setError] = useState("");
   const [aviso, setAviso] = useState("");
   const [texto, setTexto] = useState("");
@@ -199,9 +201,18 @@ function Detalle({ id, onVolver }) {
               {s.equipo.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
             </select>
           </label>
-          {s.cuenta?.rol === "usuario" && (
+          {s.proyecto ? (
+            <button type="button" className="button button-outline" onClick={() => onAbrirProyecto(s.proyecto.cliente_id, s.proyecto.id)}>
+              <ArrowUpRight aria-hidden="true" /> Ver proyecto {s.proyecto.codigo}
+            </button>
+          ) : !["rechazada", "archivada"].includes(s.estado) && !convirtiendo && (
+            <button type="button" className="button button-primary" disabled={ocupado} onClick={() => { setAviso(""); setConvirtiendo(true); }}>
+              <FolderPlus aria-hidden="true" /> Convertir en proyecto
+            </button>
+          )}
+          {!s.proyecto && s.cuenta?.rol === "usuario" && (
             <button type="button" className="button button-outline" disabled={ocupado} onClick={pasarACliente}>
-              <UserCheck aria-hidden="true" /> Pasar a cliente
+              <UserCheck aria-hidden="true" /> Solo pasar a cliente
             </button>
           )}
         </div>
@@ -211,6 +222,20 @@ function Detalle({ id, onVolver }) {
         <Alerta>{error}</Alerta>
         <Alerta tipo="ok">{aviso}</Alerta>
       </div>
+
+      {convirtiendo && (
+        <div className="table-panel" style={{ marginBottom: 18, borderColor: "var(--cliente-lime)" }}>
+          <ConvertirProyecto
+            solicitud={s}
+            onCancelar={() => setConvirtiendo(false)}
+            onHecho={async (r) => {
+              setConvirtiendo(false);
+              await cargar();
+              setAviso(r.message);
+            }}
+          />
+        </div>
+      )}
 
       <Conversacion descripcion={s.descripcion} autorInicial={s.nombre} creada={s.created_at} mensajes={s.mensajes} verInternos />
 
@@ -236,7 +261,7 @@ function Detalle({ id, onVolver }) {
   );
 }
 
-export default function AdminSolicitudes({ idInicial = null, onCambiarId }) {
+export default function AdminSolicitudes({ idInicial = null, onCambiarId, onAbrirProyecto }) {
   return (
     <section aria-label="Solicitudes de presupuesto">
       <PageHeading
@@ -244,7 +269,7 @@ export default function AdminSolicitudes({ idInicial = null, onCambiarId }) {
         title={<>Solicitudes de <em>presupuesto</em></>}
         description="Responde a quienes piden presupuesto; les llega por email y, si tienen cuenta, en su área."
       />
-      {idInicial ? <Detalle id={idInicial} onVolver={() => onCambiarId(null)} /> : <Lista onAbrir={onCambiarId} />}
+      {idInicial ? <Detalle id={idInicial} onVolver={() => onCambiarId(null)} onAbrirProyecto={onAbrirProyecto} /> : <Lista onAbrir={onCambiarId} />}
     </section>
   );
 }

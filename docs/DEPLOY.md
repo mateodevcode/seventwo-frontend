@@ -63,59 +63,42 @@ En Google Cloud Console → Credenciales → tu cliente OAuth (Aplicación web):
 El remitente `no-reply@seventwo.tech` debe estar verificado en Brevo, y el dominio debe tener los registros SPF, DKIM y DMARC que pide Brevo. Si no, los correos acaban en spam.
 
 ### 2.5 Archivos de variables en el VPS
-Conéctate por SSH con el usuario `deploy`:
+Cada repo tiene en local un `.env.vps` (ignorado por git) con los valores de producción ya preparados:
+
+- **Backend:** `DB_*` apuntando a `postgres_central:5432`, CORS, cookie, secretos JWT propios de producción, Brevo y Google.
+- **Frontend:** `NEXT_PUBLIC_API_URL`.
+
+Súbelos **antes** del primer push. El workflow detecta la carpeta con el archivo dentro e inicializa el repo ahí.
+
+Primero crea las carpetas en el VPS:
 
 ```bash
-ssh -i ~/.ssh/id_vps_nuevo deploy@IP_DEL_VPS
+ssh -i ~/.ssh/id_vps_nuevo deploy@161.97.146.80 'mkdir -p /srv/infra/seventwo/seventwo-backend /srv/infra/seventwo/seventwo-frontend'
 ```
 
-**Backend.** Crea la carpeta, vacía; el workflow clona el repo dentro en el primer deploy:
+Después sube el archivo del backend:
 
 ```bash
-mkdir -p /srv/infra/seventwo
+scp -i ~/.ssh/id_vps_nuevo seventwo-backend/.env.vps deploy@161.97.146.80:/srv/infra/seventwo/seventwo-backend/.env
 ```
 
-El primer deploy falla a propósito con `❌ Falta .env` y deja el repo clonado. Entonces crea el archivo a partir del ejemplo:
+Y el del frontend:
 
 ```bash
-cd /srv/infra/seventwo/seventwo-backend
-cp .env.example .env && nano .env
+scp -i ~/.ssh/id_vps_nuevo seventwo-frontend/.env.vps deploy@161.97.146.80:/srv/infra/seventwo/seventwo-frontend/.env.production
 ```
 
-Rellena estos valores:
-
-```
-NODE_ENV=production
-DATABASE_URL=postgres://adminst:CONTRASEÑA_DE_ADMINST@postgres_central:5432/seventwo
-FRONTEND_URL=https://seventwo.tech,https://www.seventwo.tech
-COOKIE_DOMAIN=.seventwo.tech
-JWT_SECRET=...            # node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-JWT_REFRESH_SECRET=...    # otro distinto
-AUTH_PEPPER=...           # otro distinto
-BREVO_SMTP_EMAIL=...
-BREVO_SMTP_PASS=...
-BREVO_EMAIL_NO_REPLY=no-reply@seventwo.tech
-GOOGLE_CLIENT_ID=...
-GOOGLE_CLIENT_SECRET=...
-GOOGLE_REDIRECT_URI=https://api.seventwo.tech/auth/google/callback
-```
-
-La base `seventwo` la crea el workflow si no existe, y las migraciones se aplican solas al arrancar el contenedor. Evita el carácter `$` en los valores (docker compose lo interpreta); si lo necesitas, escríbelo como `$$`.
-
-**Frontend.** Pasa lo mismo: el primer deploy falla con `❌ Falta .env.production` y deja el repo clonado.
+Por último, restringe los permisos a tu usuario:
 
 ```bash
-cd /srv/infra/seventwo/seventwo-frontend
-cp .env.example .env.production && nano .env.production
+ssh -i ~/.ssh/id_vps_nuevo deploy@161.97.146.80 'chmod 600 /srv/infra/seventwo/*/.env*'
 ```
 
-Contenido:
-
-```
-NEXT_PUBLIC_API_URL=https://api.seventwo.tech
-```
-
-Si prefieres no esperar al fallo, puedes clonar tú los repos en esas carpetas y crear los archivos antes del primer push.
+Notas:
+- El backend se conecta a Postgres por la red interna: `DB_HOST=postgres_central`, `DB_PORT=5432`. El **5435** es el puerto expuesto en la IP pública, solo para conectarse desde fuera (por ejemplo, desde tu PC).
+- La base `seventwo` la crea el workflow si no existe, y las migraciones se aplican solas al arrancar el contenedor.
+- Evita el carácter `$` en los valores (docker compose lo interpreta); si lo necesitas, escríbelo como `$$`.
+- Si prefieres editarlos a mano en el VPS, parte de `.env.example`.
 
 ## 3. Desplegar
 

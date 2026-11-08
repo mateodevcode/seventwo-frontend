@@ -3,7 +3,7 @@
 // Admin → Catálogo: servicios con precio base, modelo de cobro y lo que incluyen.
 // Al crear un proyecto, elegir un servicio rellena esos datos.
 import { useEffect, useState } from "react";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import PageHeading from "@/views/area-cliente/components/PageHeading";
 import { api } from "@/lib/api";
 import { MODELOS_COBRO, PERIODICIDADES, TIPOS_PROYECTO, dinero, erroresDe } from "@/lib/clientes";
@@ -101,6 +101,26 @@ export default function AdminCatalogo() {
     return () => { vigente = false; };
   }, [version]);
 
+  const [borrando, setBorrando] = useState(null);
+  const eliminar = async (s) => {
+    const aviso = s.proyectos
+      ? `¿Eliminar «${s.nombre}»? Los ${s.proyectos} proyecto(s) ya terminados que lo usaron conservan sus datos.`
+      : `¿Eliminar «${s.nombre}»? No se puede deshacer.`;
+    if (!window.confirm(aviso)) return;
+    setBorrando(s.id);
+    setOk("");
+    setError("");
+    try {
+      const r = await api(`/admin/servicios/${s.id}`, { method: "DELETE", auth: true });
+      setOk(r.message);
+      setVersion((v) => v + 1);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBorrando(null);
+    }
+  };
+
   const guardar = async (body) => {
     const r = editando === "nuevo"
       ? await api("/admin/servicios", { method: "POST", auth: true, body })
@@ -142,10 +162,23 @@ export default function AdminCatalogo() {
                 </span>
                 <span>{MODELOS_COBRO[s.modelo_cobro]}{s.periodicidad ? ` · ${PERIODICIDADES[s.periodicidad].toLowerCase()}` : ""}</span>
                 <span>{dinero(s.precio_base, s.moneda)}</span>
-                <span>{s.incluye.length} elementos</span>
-                <span className="admin-acciones">
-                  <button type="button" className="icon-button" aria-label={`Editar ${s.nombre}`} onClick={() => { setOk(""); setEditando(s); }}>
+                <span className="admin-user">
+                  <span>{s.incluye.length} elementos</span>
+                  <span>{s.proyectos_activos ? `En uso · ${s.proyectos_activos} proyecto(s) activo(s)` : "Sin proyectos activos"}</span>
+                </span>
+                <span className="admin-acciones" style={{ gap: 6 }}>
+                  <button type="button" className="icon-button" aria-label={`Editar ${s.nombre}`} title="Editar" onClick={() => { setOk(""); setError(""); setEditando(s); }}>
                     <Pencil aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label={`Eliminar ${s.nombre}`}
+                    title={s.proyectos_activos ? "No se puede eliminar: lo usan proyectos activos. Finalízalos o desactiva el servicio." : "Eliminar"}
+                    disabled={borrando === s.id || s.proyectos_activos > 0}
+                    onClick={() => eliminar(s)}
+                  >
+                    <Trash2 aria-hidden="true" />
                   </button>
                 </span>
               </div>

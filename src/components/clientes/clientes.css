@@ -88,7 +88,8 @@
 /* Filas de tablas admin */
 .cliente-root .admin-cli-row { grid-template-columns: 2fr 1.2fr 1fr 0.9fr 0.9fr; }
 .cliente-root .admin-proy-row { grid-template-columns: 0.7fr 2fr 1fr 1.1fr 1fr; }
-.cliente-root .admin-serv-row { grid-template-columns: 2fr 1fr 1fr 1fr 0.7fr; }
+.cliente-root .admin-serv-row { grid-template-columns: 2fr 1fr 1fr 1.3fr 84px; }
+.cliente-root .admin-serv-row .icon-button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* Editor de hitos */
 .cliente-root .hitos-editor { display: flex; flex-direction: column; gap: 10px; }

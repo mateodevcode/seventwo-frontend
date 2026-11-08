@@ -12,8 +12,8 @@ El frontend (`seventwo.tech`) y la API (`api.seventwo.tech`) se despliegan en el
 
 | | Frontend | Backend |
 |---|---|---|
-| Repo | `mateodevcode/seventwo-frontend` | `mateodevcode/backend-seventwo` |
-| Carpeta en el VPS | `/srv/infra/seventwo/seventwo-frontend` | `/srv/infra/seventwo/backend-seventwo` |
+| Repo | `mateodevcode/seventwo-frontend` | `mateodevcode/seventwo-backend` |
+| Carpeta en el VPS | `/srv/infra/seventwo/seventwo-frontend` | `/srv/infra/seventwo/seventwo-backend` |
 | Dominio | `seventwo.tech` (`www` redirige a `seventwo.tech`) | `api.seventwo.tech` |
 | Contenedor | `seventwo-web` · `127.0.0.1:4001` → 3000 | `seventwo-backend` · `127.0.0.1:4000` |
 | Variables | `.env.production` | `.env` |
@@ -78,7 +78,7 @@ mkdir -p /srv/infra/seventwo
 El primer deploy falla a propósito con `❌ Falta .env` y deja el repo clonado. Entonces crea el archivo a partir del ejemplo:
 
 ```bash
-cd /srv/infra/seventwo/backend-seventwo
+cd /srv/infra/seventwo/seventwo-backend
 cp .env.example .env && nano .env
 ```
 
@@ -187,7 +187,7 @@ docker logs -f seventwo-web
 Estado:
 
 ```bash
-cd /srv/infra/seventwo/backend-seventwo && docker compose ps
+cd /srv/infra/seventwo/seventwo-backend && docker compose ps
 ```
 
 Backup de la base:

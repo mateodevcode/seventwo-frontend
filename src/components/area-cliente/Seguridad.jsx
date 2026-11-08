@@ -3,7 +3,7 @@
 // Área de cliente → Seguridad: verificación en dos pasos, contraseña y sesiones.
 import { useState } from "react";
 import { KeyRound, LogOut, ShieldCheck, ShieldOff } from "lucide-react";
-import PageHeading from "@/pages/area-cliente/components/PageHeading";
+import PageHeading from "@/views/area-cliente/components/PageHeading";
 import { api } from "@/lib/api";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { errorPassword } from "@/components/auth/RegistroForm";

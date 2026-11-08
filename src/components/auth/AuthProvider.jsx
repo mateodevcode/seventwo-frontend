@@ -47,8 +47,8 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>;
 }
 
-// Sin provider (p. ej. componentes de src/pages prerenderizados por el Pages
-// Router) se comporta como visitante anónimo en vez de romper el render.
+// Sin provider (un componente usado fuera de las rutas con <AuthProvider>)
+// se comporta como visitante anónimo en vez de romper el render.
 const SIN_PROVIDER = {
   usuario: null,
   estado: "anonimo",

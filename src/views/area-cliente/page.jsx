@@ -6,7 +6,8 @@ import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import Overview from "./Overview";
 import Proyectos from "./Proyectos";
-import EnPreparacion from "./EnPreparacion";
+import Pagos from "./Pagos";
+import Soporte from "./Soporte";
 import Help from "./Help";
 import Seguridad from "@/components/area-cliente/Seguridad";
 import Perfil from "@/components/area-cliente/Perfil";
@@ -33,7 +34,7 @@ export default function AreaClientePage() {
   const solicitud = params.get("solicitud");
   const proyecto = params.get("proyecto");
   // Enlaces antiguos a "Servicio contratado" → Mis proyectos.
-  const pedido = elegido === "servicio" ? "proyectos" : elegido;
+  const pedido = elegido === "servicio" ? "proyectos" : elegido === "facturas" ? "pagos" : elegido;
   const active = pedido && permitido(pedido) ? pedido : items[0]?.id;
   const setActive = useCallback(
     (id) => router.push(`${pathname}?seccion=${encodeURIComponent(id)}`, { scroll: false }),
@@ -74,7 +75,14 @@ export default function AreaClientePage() {
               <Proyectos key={proyecto ?? "lista"} codigoInicial={proyecto} onAbrir={abrirProyecto} onNavigate={setActive} />
             )}
             {active === "datos" && <Perfil />}
-            {["facturas", "pagos", "soporte"].includes(active) && <EnPreparacion seccion={active} onNavigate={setActive} />}
+            {active === "pagos" && <Pagos key={params.get("cobro") ?? "lista"} codigoInicial={params.get("cobro")} volviendoDeMp={params.get("mp") === "1"} />}
+            {active === "soporte" && (
+              <Soporte
+                key={params.get("ticket") ?? "lista"}
+                codigoInicial={params.get("ticket")}
+                onAbrir={(codigo) => router.push(`${pathname}?seccion=soporte${codigo ? `&ticket=${encodeURIComponent(codigo)}` : ""}`, { scroll: false })}
+              />
+            )}
             {active === "seguridad" && <Seguridad />}
             {active === "ayuda" && <Help />}
             {active === "cotizar" && <Solicitudes key={solicitud ?? "lista"} codigoInicial={solicitud} />}

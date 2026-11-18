@@ -35,6 +35,8 @@ function inicial(v) {
     fecha_inicio: v?.fecha_inicio ?? new Date().toISOString().slice(0, 10),
     fecha_entrega_estimada: v?.fecha_entrega_estimada ?? "",
     fecha_entrega: v?.fecha_entrega ?? "",
+    recordatorio_dias: v?.recordatorio_dias ?? 3,
+    avisar: true,
     progreso: v?.progreso ?? 0,
     responsable_id: v?.responsable_id ?? "",
     descripcion: v?.descripcion ?? "",
@@ -114,6 +116,8 @@ export default function ProyectoForm({ valores, equipo = [], servicios = [], onG
         })),
     };
     if (edicion) body.fecha_entrega = nulo(f.fecha_entrega);
+    else body.avisar = f.avisar;
+    body.recordatorio_dias = Number(f.recordatorio_dias) || 0;
     try {
       await onGuardar(body);
     } catch (er) {
@@ -162,7 +166,9 @@ export default function ProyectoForm({ valores, equipo = [], servicios = [], onG
             <Campo id="p-importe" label="Importe por periodo" tipo="number" min={0} step="1" value={f.importe_periodo} onChange={set("importe_periodo")} error={err("importe_periodo")}
               ayuda={f.importe_periodo ? dinero(f.importe_periodo, f.moneda) : undefined} />
             <Selector id="p-periodo" label="Periodicidad" value={f.periodicidad} onChange={set("periodicidad")} opciones={PERIODICIDADES} vacio="Elegir…" error={err("periodicidad")} />
-            <Campo id="p-proximo" label="Próximo cobro" tipo="date" value={f.proximo_cobro} onChange={set("proximo_cobro")} error={err("proximo_cobro")} />
+            <Campo id="p-proximo" label="Próximo cobro (o el primero)" tipo="date" value={f.proximo_cobro} onChange={set("proximo_cobro")} error={err("proximo_cobro")}
+              ayuda="Si es una fecha pasada, se generan también los cobros anteriores (historial) sin avisar al cliente." />
+            <Campo id="p-recordatorio" label="Recordatorio (días antes)" tipo="number" min={0} max={30} value={f.recordatorio_dias} onChange={set("recordatorio_dias")} error={err("recordatorio_dias")} />
           </>
         ) : horas ? (
           <>
@@ -215,6 +221,13 @@ export default function ProyectoForm({ valores, equipo = [], servicios = [], onG
         <label htmlFor="p-desc">Descripción (la ve el cliente)</label>
         <textarea id="p-desc" className="solicitud-textarea" rows={4} maxLength={5000} value={f.descripcion} onChange={set("descripcion")} />
       </div>
+
+      {!edicion && (
+        <label className="solicitud-check">
+          <input type="checkbox" checked={f.avisar} onChange={(e) => setF((x) => ({ ...x, avisar: e.target.checked }))} />
+          Avisar al cliente por email ahora (desmárcalo para cargar un cliente con historial y enviarle después la bienvenida desde su ficha).
+        </label>
+      )}
 
       <div className="auth-row">
         <Boton type="submit" cargando={cargando} disabled={f.nombre.trim().length < 2}>{textoGuardar}</Boton>

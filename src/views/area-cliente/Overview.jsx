@@ -5,7 +5,7 @@ import { ArrowUpRight, Check, FilePlus2, FileText, FolderKanban, Plus, Sparkles,
 import PageHeading from "./components/PageHeading";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { api } from "@/lib/api";
-import { fecha } from "@/lib/clientes";
+import { dinero, fecha } from "@/lib/clientes";
 import { haceCuanto } from "@/lib/solicitudes";
 import { PillProyecto, Progreso } from "@/components/clientes/Proyecto";
 import "@/components/clientes/clientes.css";
@@ -45,12 +45,13 @@ export default function Overview({ onNavigate, onAbrirProyecto }) {
     return () => { vigente = false; };
   }, [version]);
   useEffect(() => {
-    const fn = (ev) => /^(proyecto_|solicitud_|contrato_)/.test(ev.detail?.tipo ?? "") && setVersion((v) => v + 1);
+    const fn = (ev) => /^(proyecto_|solicitud_|contrato_|cobro_|pago_)/.test(ev.detail?.tipo ?? "") && setVersion((v) => v + 1);
     window.addEventListener("seventwo:notificacion", fn);
     return () => window.removeEventListener("seventwo:notificacion", fn);
   }, []);
 
   const principal = r?.proyectos?.[0];
+  const cuenta = r?.estado_cuenta;
   const otros = (r?.proyectos?.length ?? 0) - 1;
 
   return (
@@ -121,14 +122,30 @@ export default function Overview({ onNavigate, onAbrirProyecto }) {
         <div className="stats-card">
           <div className="stat-heading">
             <span>Estado de cuenta</span>
-            <span className="status-dot">Al día</span>
+            {cuenta && (Number(cuenta.vencido) > 0
+              ? <span className="status-dot" style={{ color: "#ff6b81" }}>Pago vencido</span>
+              : <span className="status-dot">Al día</span>)}
           </div>
           <div className="stat-main">
-            <strong style={{ fontSize: 22 }}>Sin cobros pendientes</strong>
-            <span>Tus cuentas de cobro y pagos aparecerán aquí muy pronto.</span>
+            {cuenta && Number(cuenta.pendiente) > 0 ? (
+              <>
+                <strong>{dinero(cuenta.pendiente)}</strong>
+                <span>pendiente · próximo pago {fecha(cuenta.proximo_vencimiento)}</span>
+              </>
+            ) : cuenta?.proximo_recurrente ? (
+              <>
+                <strong style={{ fontSize: 22 }}>Sin pagos pendientes</strong>
+                <span>próximo pago {fecha(cuenta.proximo_recurrente)}{cuenta.importe_recurrente ? ` · ${dinero(cuenta.importe_recurrente)}` : ""}</span>
+              </>
+            ) : (
+              <>
+                <strong style={{ fontSize: 22 }}>Sin pagos pendientes</strong>
+                <span>{cuenta?.en_verificacion ? "Estamos verificando tu comprobante." : "Aquí verás tus próximos pagos."}</span>
+              </>
+            )}
           </div>
-          <button type="button" className="button button-outline" onClick={() => onNavigate("datos")}>
-            Datos de facturación <ArrowUpRight aria-hidden="true" />
+          <button type="button" className="button button-outline" onClick={() => onNavigate("pagos")}>
+            Ver pagos <ArrowUpRight aria-hidden="true" />
           </button>
         </div>
       </div>

@@ -131,6 +131,73 @@
 .cliente-root .pill.contrato-borrador { background: transparent; border: 1px dashed var(--cliente-lime); color: var(--cliente-lime); }
 .cliente-root .pill.contrato-reemplazado { background: transparent; border: 1px solid var(--cliente-line); color: var(--cliente-muted); }
 
+/* Cobros y pagos */
+.cliente-root .cobro { border-top: 1px solid var(--cliente-line); }
+.cliente-root .cobro-fila {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto auto 18px;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  padding: 14px 4px;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--cliente-line);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cliente-root .cobro > .cobro-fila { border-top: 0; }
+.cliente-root .cobro-fila:hover { background: rgba(255, 255, 0, 0.04); }
+.cliente-root .cobro-fecha { font: 12px monospace; color: var(--cliente-muted); }
+.cliente-root .cobro-concepto strong { display: block; font-size: 13px; color: var(--cliente-fg); }
+.cliente-root .cobro-concepto small { display: block; margin-top: 3px; font-size: 11px; color: var(--cliente-muted); }
+.cliente-root .cobro-importe { font-size: 14px; color: var(--cliente-fg); white-space: nowrap; }
+.cliente-root .cobro-flecha { width: 15px; height: 15px; color: var(--cliente-muted); transition: transform 0.15s; }
+.cliente-root .cobro.abierto .cobro-flecha { transform: rotate(180deg); }
+.cliente-root .cobro-detalle { padding: 4px 4px 18px 124px; display: flex; flex-direction: column; gap: 10px; }
+.cliente-root .cobro-detalle .button { align-self: flex-start; }
+.cliente-root .pago-linea { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; font-size: 12px; color: #d3c9e2; }
+.cliente-root .cobro-alerta { display: block; margin-top: 4px; color: #ff6b81; font-size: 11px; }
+.cliente-root .cobro-check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.cliente-root .cobro-check input { margin-top: 3px; accent-color: var(--cliente-lime); }
+.cliente-root .cobro-check strong { display: block; font-size: 14px; color: var(--cliente-fg); }
+.cliente-root .cobro-check small { display: block; margin-top: 4px; color: var(--cliente-muted); font-size: 11px; }
+.cliente-root .lote { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 14px; border: 1px dashed var(--cliente-line); }
+.cliente-root .lote strong { font-size: 12px; color: var(--cliente-fg); flex: 1 1 220px; }
+.cliente-root .lote .solicitud-select { width: auto; height: 36px; }
+.cliente-root .lote .auth-button { width: auto; }
+.cliente-root .verificar { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.cliente-root .adjuntar { display: inline-flex; align-items: center; gap: 8px; }
+.cliente-root .pill.cobro-pagado,
+.cliente-root .pill.pago-confirmado { background: #00a49c; border-color: #00a49c; color: #100b17; }
+.cliente-root .pill.cobro-pendiente,
+.cliente-root .pill.cobro-parcial,
+.cliente-root .pill.pago-en_verificacion { background: transparent; border: 1px solid var(--cliente-lime); color: var(--cliente-lime); }
+.cliente-root .pill.cobro-vencido,
+.cliente-root .pill.pago-rechazado { background: #ff6b81; border-color: #ff6b81; color: #100b17; }
+.cliente-root .pill.ticket-abierto { background: #ff6b81; border-color: #ff6b81; color: #100b17; }
+.cliente-root .pill.ticket-en_progreso,
+.cliente-root .pill.ticket-esperando_cliente { background: transparent; border: 1px solid var(--cliente-lime); color: var(--cliente-lime); }
+.cliente-root .pill.ticket-resuelto { background: #00a49c; border-color: #00a49c; color: #100b17; }
+.cliente-root .pill.ticket-cerrado { background: transparent; border: 1px solid var(--cliente-line); color: var(--cliente-muted); }
+.cliente-root .pill.cobro-anulado { background: transparent; border: 1px solid var(--cliente-line); color: var(--cliente-muted); }
+@media (max-width: 700px) {
+  .cliente-root .cobro-fila { grid-template-columns: 1fr auto; }
+  .cliente-root .cobro-fila .cobro-fecha { grid-column: 1 / -1; }
+  .cliente-root .cobro-fila .cobro-flecha { display: none; }
+  .cliente-root .cobro-detalle { padding-left: 4px; }
+}
+
+.cliente-root .lectura-ia { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 8px 10px; border: 1px dashed var(--cliente-line); font-size: 12px; color: #d3c9e2; }
+.cliente-root .lectura-ia strong { flex-basis: 100%; font: 10px monospace; text-transform: uppercase; letter-spacing: 0.06em; color: var(--cliente-muted); }
+.cliente-root .lectura-ia .li-distinto,
+.cliente-root .lectura-ia .li-fuera_de_rango,
+.cliente-root .lectura-ia .li-ya_usada { color: #ff6b81; }
+.cliente-root .lectura-ia .li-coincide,
+.cliente-root .lectura-ia .li-nueva { color: #00a49c; }
+
 .cliente-root .aviso-contrato {
   display: flex;
   align-items: center;

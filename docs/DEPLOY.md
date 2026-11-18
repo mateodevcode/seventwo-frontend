@@ -180,6 +180,25 @@ Para comprobarlo, abre en el navegador la URL directa de un contrato, sin firma:
 
 Los PDF suben a través de la API, hasta 10 MB. Por eso `nginx/seventwo-api.conf` permite cuerpos de hasta 11 MB.
 
+### 2.8 Pagos: Mercado Pago y lectura de comprobantes (opcionales)
+Sin estas variables, los cobros y pagos funcionan igual: registro manual, en lote y con comprobante verificado a mano. Cada una activa una parte:
+
+```
+MP_ACCESS_TOKEN=TEST-...        # Checkout Pro. TEST-… = modo prueba (sandbox); APP_USR-… = producción
+MP_WEBHOOK_SECRET=...           # clave secreta de Webhooks (Tus integraciones → Webhooks)
+ANTHROPIC_API_KEY=sk-ant-...    # lectura automática de comprobantes con Claude (no confirma pagos)
+# API_PUBLIC_URL=https://api.seventwo.tech   (por defecto en producción)
+```
+
+En el panel de Mercado Pago (Tus integraciones → tu aplicación → **Webhooks**):
+- URL de producción: `https://api.seventwo.tech/webhooks/mercadopago`
+- Evento: **Pagos**.
+- Copia la clave secreta a `MP_WEBHOOK_SECRET`.
+
+Cada preferencia de pago también envía esa URL como `notification_url`.
+
+Tras cambiar el `.env`: `docker compose up -d` en la carpeta del backend. El log de arranque lista los canales desactivados.
+
 ## 3. Desplegar
 
 **Orden: primero el backend.** El frontend necesita la API para funcionar, y conviene que certbot no se ejecute dos veces a la vez.

@@ -24,6 +24,17 @@ export const fechaHoraLarga = (iso) =>
   iso ? new Date(iso).toLocaleString("es-CO", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
 export const tamano = (bytes) => (bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
 
+export const VIAS_PAGO = {
+  nequi: "Nequi", transferencia: "Transferencia", mercadopago: "Mercado Pago", efectivo: "Efectivo", tarjeta: "Tarjeta", otro: "Otro",
+};
+export const ESTADOS_COBRO = { pendiente: "Pendiente", parcial: "Pago parcial", pagado: "Pagado", anulado: "Anulado", vencido: "Vencido" };
+export const ESTADOS_PAGO = { en_verificacion: "Por verificar", confirmado: "Confirmado", rechazado: "Rechazado" };
+export const TIPOS_COMPROBANTE = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+export const hoyISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
 export const ESTADOS_HITO = { pendiente: "Pendiente", en_curso: "En curso", completado: "Completado" };
 export const TIPOS_PROYECTO = ["Página web", "Aplicación web", "App móvil", "Software a medida", "Mantenimiento", "Otro"];
 

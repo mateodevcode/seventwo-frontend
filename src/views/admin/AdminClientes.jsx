@@ -4,10 +4,10 @@
 // proyectos, historial) y editor de proyectos (docs/CLIENTES.md §7.2).
 // La URL manda: /admin?seccion=clientes&cliente=3&proyecto=7
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, ArrowUpRight, Pencil, Plus, Search } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Pencil, Plus, Search, Send } from "lucide-react";
 import PageHeading from "@/views/area-cliente/components/PageHeading";
 import { api } from "@/lib/api";
-import { ESTADOS_CLIENTE, MODELOS_COBRO, documento, fecha, valorProyecto } from "@/lib/clientes";
+import { ESTADOS_CLIENTE, MODELOS_COBRO, dinero, documento, fecha, valorProyecto } from "@/lib/clientes";
 import { ESTADOS as ESTADOS_SOLICITUD, fechaCorta } from "@/lib/solicitudes";
 import { ETIQUETA_ROL } from "@/lib/roles";
 import { Alerta } from "@/components/auth/ui";
@@ -16,6 +16,7 @@ import FichaVista from "@/components/clientes/FichaVista";
 import { Hitos, ListaActividad, MetaProyecto, PillCliente, PillProyecto, Progreso } from "@/components/clientes/Proyecto";
 import ProyectoForm from "./ProyectoForm";
 import ContratosAdmin from "./ContratosAdmin";
+import CobrosAdmin from "./CobrosAdmin";
 import "@/components/area-cliente/solicitudes.css";
 import "@/components/clientes/clientes.css";
 
@@ -150,7 +151,10 @@ function ProyectoAdmin({ id, onVolver }) {
 
   // El cliente acepta el contrato → se refresca la evidencia al momento.
   useEffect(() => {
-    const fn = (ev) => ev.detail?.tipo === "contrato_aceptado" && String(ev.detail?.datos?.proyecto_id) === String(id) && setVersion((v) => v + 1);
+    const fn = (ev) => {
+      const t = ev.detail?.tipo ?? "";
+      if ((t === "contrato_aceptado" && String(ev.detail?.datos?.proyecto_id) === String(id)) || /^(pago_|cobro_)/.test(t)) setVersion((v) => v + 1);
+    };
     window.addEventListener("seventwo:notificacion", fn);
     return () => window.removeEventListener("seventwo:notificacion", fn);
   }, [id]);
@@ -211,6 +215,8 @@ function ProyectoAdmin({ id, onVolver }) {
       )}
       <p className="eyebrow" style={{ marginTop: 28 }}>Contrato</p>
       <ContratosAdmin proyectoId={p.id} contratos={p.contratos} almacen={p.almacen} onCambio={() => setVersion((v) => v + 1)} />
+      <p className="eyebrow" style={{ marginTop: 28 }}>Cobros y pagos</p>
+      <CobrosAdmin proyecto={p} onCambio={() => setVersion((v) => v + 1)} />
     </div>
   );
 }
@@ -249,8 +255,28 @@ function Ficha({ id, onVolver, onAbrirProyecto, onAbrirSolicitud }) {
             Cuenta: {c.cuenta ? `${c.cuenta.name} · ${ETIQUETA_ROL[c.cuenta.rol]}${c.cuenta.bloqueado ? " · bloqueada" : ""}` : "sin cuenta (se vinculará cuando se registre y verifique este email)"}
           </p>
         </div>
-        <PillCliente estado={c.estado} />
+        <div style={{ display: "grid", gap: 10, justifyItems: "end" }}>
+          <PillCliente estado={c.estado} />
+          <button
+            type="button"
+            className="button button-outline"
+            onClick={async () => {
+              if (!window.confirm(`¿Enviar el email de bienvenida a ${c.email}? Explica cómo entrar a su espacio, ver su servicio, contrato y pagos, y adjuntar comprobantes.`)) return;
+              try { setError(""); setOk((await api(`/admin/clientes/${id}/bienvenida`, { method: "POST", auth: true })).message); } catch (e) { setOk(""); setError(e.message); }
+            }}
+          >
+            <Send aria-hidden="true" /> Enviar bienvenida
+          </button>
+        </div>
       </div>
+
+      {c.estado_cuenta && (Number(c.estado_cuenta.pendiente) > 0 || c.estado_cuenta.cobros_pagados > 0) && (
+        <div className="invoice-summary">
+          <div><span>Pendiente</span><strong>{dinero(c.estado_cuenta.pendiente)}</strong>{Number(c.estado_cuenta.vencido) > 0 && <small className="cobro-alerta">{dinero(c.estado_cuenta.vencido)} vencido</small>}</div>
+          <div><span>Próximo pago</span><strong>{fecha(c.estado_cuenta.proximo_vencimiento ?? c.estado_cuenta.proximo_recurrente)}</strong></div>
+          <div><span>Cobros pagados</span><strong>{c.estado_cuenta.cobros_pagados}</strong>{c.estado_cuenta.en_verificacion > 0 && <small className="cobro-alerta">{c.estado_cuenta.en_verificacion} por verificar</small>}</div>
+        </div>
+      )}
 
       <div className="tabs" role="tablist">
         {TABS.map(([k, t]) => (

@@ -1,6 +1,21 @@
 # Clientes, proyectos, contratos, cobros, pagos y soporte — plan y maquetas
 
-Estado: **F1 implementada** (08 nov 2026): ficha de cliente, catálogo, proyectos con hitos, "Convertir en proyecto", historial, Resumen y Mis proyectos reales, y datos de facturación en el perfil (migración `005_clientes_proyectos.sql`). **F2 implementada**: contratos en PDF guardados en S3, en la carpeta privada `seventwo/privado/contratos/…`; en la BD solo van la clave y la huella SHA-256 (migración `006_contratos.sql`). Cada contrato puede ser un borrador o subirse ya firmado fuera. El equipo lo envía con una nota y el cliente lo acepta escribiendo su nombre; se guardan la fecha, la IP, el navegador y la huella, que se verifica contra S3 antes de aceptar. Cada nueva versión reemplaza a la vigente. Ver `DEPLOY.md` §2.7 (política del bucket). Cuentas de cobro, pagos y soporte muestran "Muy pronto" hasta F3–F5. Sigue a `PRESUPUESTOS.md`: este plan empieza donde termina una solicitud **aceptada**.
+Estado: **F1 implementada** (08 nov 2026): ficha de cliente, catálogo, proyectos con hitos, "Convertir en proyecto", historial, Resumen y Mis proyectos reales, y datos de facturación en el perfil (migración `005_clientes_proyectos.sql`). **F2 implementada**: contratos en PDF guardados en S3, en la carpeta privada `seventwo/privado/contratos/…`; en la BD solo van la clave y la huella SHA-256 (migración `006_contratos.sql`). Cada contrato puede ser un borrador o subirse ya firmado fuera. El equipo lo envía con una nota y el cliente lo acepta escribiendo su nombre; se guardan la fecha, la IP, el navegador y la huella, que se verifica contra S3 antes de aceptar. Cada nueva versión reemplaza a la vigente. Ver `DEPLOY.md` §2.7 (política del bucket).
+
+**F3, F4 y F5 implementadas** (18 nov 2026, migraciones `007_cobros_pagos.sql` y `008_tickets.sql`). Cambios respecto al plan original:
+
+- **Sin cuentas de cobro en PDF.** Seventwo es S.A.S. y cobra con IVA, así que el documento fiscal es la factura electrónica DIAN de su proveedor. Aquí se lleva la trazabilidad: **cobros** (`C-0001`: mensualidad, hito o manual) y sus **pagos**.
+- **Mensualidades automáticas.** Un proyecto `recurrente` genera cada cobro cuando entra en su ventana de recordatorio (por defecto 3 días antes). Si el primer cobro es una fecha pasada, se genera todo el historial **en silencio**: sin recordatorios ni avisos de vencido. Los cobros se tratan como **mes vencido**: el del 16 de noviembre cubre del 16 de octubre al 15 de noviembre.
+- **Pagos.** Hay cuatro formas de registrarlos:
+  - el equipo los registra uno a uno;
+  - el equipo marca varios en lote como pagados en su fecha de cobro, para cargar historial;
+  - el cliente sube el comprobante (foto o PDF, 5 MB) y el pago queda **por verificar**;
+  - Mercado Pago los confirma por webhook firmado.
+
+  La foto de un pago ya registrado la pueden adjuntar el cliente (si aún no tiene) o el equipo (que también puede reemplazarla).
+- **IA.** Con `ANTHROPIC_API_KEY`, cada comprobante subido se lee con Claude: importe, fecha, referencia, entidad y confianza. La lectura se contrasta con el cobro, incluida la detección de referencias ya usadas, y se muestra al equipo y en Telegram. **Nunca confirma sola.**
+- **Soporte.** Tickets `T-0001` con conversación, notas internas, prioridad, estado y asignado. Una respuesta del cliente reabre el ticket.
+- **Bienvenida.** Desde la ficha del cliente, el botón «Enviar bienvenida» manda un email formal con el acceso a su espacio. Al crear un proyecto, la casilla «Avisar al cliente» permite cargar historial sin escribirle. Sigue a `PRESUPUESTOS.md`: este plan empieza donde termina una solicitud **aceptada**.
 
 En F1, "Convertir en proyecto" también acepta solicitudes en `nueva`, `en_revision` o `respondida`, y las deja en `aceptada`. Las rechazadas y archivadas no se pueden convertir.
 

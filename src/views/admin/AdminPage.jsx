@@ -6,13 +6,15 @@
 //   /admin?seccion=clientes&cliente=3&proyecto=7
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Building2, Inbox, Layers, UserRound, Users } from "lucide-react";
+import { Building2, Headphones, Inbox, Layers, UserRound, Users, WalletCards } from "lucide-react";
 import Sidebar from "@/views/area-cliente/components/Sidebar";
 import Topbar from "@/views/area-cliente/components/Topbar";
 import AdminUsuarios from "./AdminUsuarios";
 import AdminSolicitudes from "./AdminSolicitudes";
 import AdminClientes from "./AdminClientes";
 import AdminCatalogo from "./AdminCatalogo";
+import AdminPagos from "./AdminPagos";
+import AdminTickets from "./AdminTickets";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { api } from "@/lib/api";
 import { ETIQUETA_ROL } from "@/lib/roles";
@@ -27,6 +29,8 @@ export default function AdminPage() {
   const pathname = usePathname();
   const params = useSearchParams();
   const [nuevas, setNuevas] = useState(0);
+  const [porVerificar, setPorVerificar] = useState(0);
+  const [ticketsAbiertos, setTicketsAbiertos] = useState(0);
 
   const solicitudId = params.get("solicitud");
   const clienteId = params.get("cliente");
@@ -46,10 +50,17 @@ export default function AdminPage() {
   // Contador de solicitudes nuevas en la barra lateral (se refresca con cada aviso).
   useEffect(() => {
     let vigente = true;
-    const contar = () =>
+    const contar = () => {
       api("/admin/solicitudes?estado=nueva", { auth: true })
         .then((r) => vigente && setNuevas(r.data.conteos.nueva))
         .catch(() => {});
+      api("/admin/cobros", { auth: true })
+        .then((r) => vigente && setPorVerificar(r.data.verificar.length))
+        .catch(() => {});
+      api("/admin/tickets?estado=abierto", { auth: true })
+        .then((r) => vigente && setTicketsAbiertos(r.data.conteos.abierto))
+        .catch(() => {});
+    };
     contar();
     window.addEventListener("seventwo:notificacion", contar);
     return () => {
@@ -61,6 +72,8 @@ export default function AdminPage() {
   const secciones = [
     { id: "solicitudes", label: "Solicitudes", icon: Inbox, badge: nuevas ? String(nuevas) : null },
     { id: "clientes", label: "Clientes", icon: Building2 },
+    { id: "pagos", label: "Pagos", icon: WalletCards, badge: porVerificar ? String(porVerificar) : null },
+    { id: "soporte", label: "Soporte", icon: Headphones, badge: ticketsAbiertos ? String(ticketsAbiertos) : null },
     { id: "catalogo", label: "Catálogo", icon: Layers },
     { id: "usuarios", label: "Usuarios y roles", icon: Users },
   ];
@@ -93,6 +106,14 @@ export default function AdminPage() {
                 proyectoId={proyectoId}
                 onIr={(extra) => ir("clientes", extra)}
                 onAbrirSolicitud={(id) => ir("solicitudes", { solicitud: id })}
+              />
+            )}
+            {current.id === "pagos" && <AdminPagos onAbrirProyecto={(cliente, proyecto) => ir("clientes", { cliente, proyecto })} />}
+            {current.id === "soporte" && (
+              <AdminTickets
+                ticketId={params.get("ticket")}
+                onAbrir={(ticket) => ir("soporte", { ticket })}
+                onAbrirCliente={(cliente, proyecto) => ir("clientes", { cliente, proyecto })}
               />
             )}
             {current.id === "catalogo" && <AdminCatalogo />}

@@ -1,7 +1,6 @@
 import {
   CircleHelp,
   FilePlus2,
-  FileText,
   FolderKanban,
   Headphones,
   LayoutDashboard,
@@ -19,7 +18,6 @@ export const navigation = [
   { id: "proyectos", label: "Mis proyectos", icon: FolderKanban, minimo: "cliente" },
   { id: "datos", label: "Mi perfil", icon: UserRound, minimo: "usuario" },
   { id: "cotizar", label: "Solicitar presupuesto", icon: FilePlus2, minimo: "usuario" },
-  { id: "facturas", label: "Cuentas de cobro", icon: FileText, minimo: "cliente" },
   { id: "pagos", label: "Pagos", icon: WalletCards, minimo: "cliente" },
   { id: "soporte", label: "Soporte", icon: Headphones, minimo: "cliente" },
   { id: "seguridad", label: "Seguridad", icon: LockKeyhole, minimo: "usuario" },
